@@ -1,4 +1,4 @@
-# EasyBusiness
+# EasyBusiness https://easybuniness.onrender.com
 
 Este é um site para cadastro e gerenciamento de empresas. Nele, as empresas podem se cadastrar, fazer login, adicionar e editar produtos, gerenciar seu perfil e visualizar os dados da empresa de maneira intuitiva.
 
