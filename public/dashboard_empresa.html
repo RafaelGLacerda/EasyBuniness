@@ -19,7 +19,22 @@
         <p id="enderecoEmpresa">Endereço:</p>
         <p id="contatosEmpresa">Contatos:</p>
         <p id="telefoneEmpresa">Telefone:</p>
-        <button class="logout-btn" onclick="alterarStatus()">Alterar status</button>
+
+        <div style="display: flex; gap: 10px; margin: 15px 0;">
+          <button class="logout-btn" onclick="alterarStatus()">Alterar status</button>
+          <button class="logout-btn" style="background-color: #007bff;" onclick="toggleEditar()">Editar Dados</button>
+        </div>
+
+        <form id="formEdicao" style="display: none; margin-top: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="text" id="editNome" placeholder="Nome" class="input-campo" />
+            <input type="text" id="editTelefone" placeholder="Telefone" class="input-campo" />
+            <input type="text" id="editContatos" placeholder="Contatos" class="input-campo" />
+            <input type="text" id="editDescricao" placeholder="Descrição" class="input-campo" />
+            <input type="text" id="editEndereco" placeholder="Endereço" class="input-campo" />
+            <button type="button" class="logout-btn" style="background-color: #28a745;" onclick="salvarEdicao()">Salvar Alterações</button>
+          </div>
+        </form>
       </div>
 
       <div class="add-produto-container">
@@ -27,29 +42,24 @@
       </div>
     </div>
 
-    <h2>Produtos da empresa</h2>
-    <p id="qtdProdutos">Quantidade: 0</p>
+    <h2 style="color: rgb(247, 251, 252); margin-bottom: 10px;">Produtos da empresa</h2>
+    <p id="qtdProdutos" style="color: white; margin-bottom: 20px;">Quantidade: 0</p>
 
     <div id="listaProdutos" class="produtos-grid"></div>
   </div>
 
   <script>
+    let empresaLogada = null;
+
     document.addEventListener('DOMContentLoaded', () => {
-      const empresaLogada = JSON.parse(localStorage.getItem('empresa'));
+      empresaLogada = JSON.parse(localStorage.getItem('empresa'));
       if (!empresaLogada) {
         alert("Faça login primeiro.");
         window.location.href = './login_empresa.html';
         return;
       }
 
-      // Elementos do DOM
-      document.getElementById('nomeEmpresa').textContent = empresaLogada.nome || "Sem nome";
-      document.getElementById('emailEmpresa').textContent = "Email: " + (empresaLogada.email || "Sem email");
-      document.getElementById('statusEmpresa').textContent = "Status: " + (empresaLogada.status || "Indefinido");
-      document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresaLogada.descricao || "Não informada");
-      document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresaLogada.endereco || "Não informado");
-      document.getElementById('contatosEmpresa').textContent = "Contatos: " + (empresaLogada.contatos || "Não informados");
-      document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresaLogada.telefone || "Não informado");
+      atualizarDadosEmpresa();
 
       const produtos = empresaLogada.produtos || [];
       document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
@@ -71,6 +81,56 @@
       });
     });
 
+    function atualizarDadosEmpresa() {
+      document.getElementById('nomeEmpresa').textContent = empresaLogada.nome || "Sem nome";
+      document.getElementById('emailEmpresa').textContent = "Email: " + (empresaLogada.email || "Sem email");
+      document.getElementById('statusEmpresa').textContent = "Status: " + (empresaLogada.status || "Indefinido");
+      document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresaLogada.descricao || "Não informada");
+      document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresaLogada.endereco || "Não informado");
+      document.getElementById('contatosEmpresa').textContent = "Contatos: " + (empresaLogada.contatos || "Não informados");
+      document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresaLogada.telefone || "Não informado");
+    }
+
+    function toggleEditar() {
+      const form = document.getElementById('formEdicao');
+      if (form.style.display === "none") {
+        document.getElementById('editNome').value = empresaLogada.nome || '';
+        document.getElementById('editTelefone').value = empresaLogada.telefone || '';
+        document.getElementById('editContatos').value = empresaLogada.contatos || '';
+        document.getElementById('editDescricao').value = empresaLogada.descricao || '';
+        document.getElementById('editEndereco').value = empresaLogada.endereco || '';
+        form.style.display = "block";
+      } else {
+        form.style.display = "none";
+      }
+    }
+
+    async function salvarEdicao() {
+  empresaLogada.nome = document.getElementById('editNome').value.trim();
+  empresaLogada.telefone = document.getElementById('editTelefone').value.trim();
+  empresaLogada.contatos = document.getElementById('editContatos').value.trim();
+  empresaLogada.descricao = document.getElementById('editDescricao').value.trim();
+  empresaLogada.endereco = document.getElementById('editEndereco').value.trim();
+
+  try {
+    const res = await fetch('https://easybuniness.onrender.com/api/atualizarEmpresa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(empresaLogada)
+    });
+
+    if (!res.ok) throw new Error('Erro ao salvar dados no servidor');
+
+    localStorage.setItem('empresa', JSON.stringify(empresaLogada));
+    atualizarDadosEmpresa();
+    document.getElementById('formEdicao').style.display = "none";
+    alert("Dados atualizados com sucesso!");
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao salvar no servidor.");
+  }
+}
+
     function logout() {
       localStorage.removeItem('empresa');
       window.location.href = './index.html';
@@ -78,25 +138,18 @@
 
     async function alterarStatus() {
       try {
-        const empresa = JSON.parse(localStorage.getItem('empresa'));
-        if (!empresa) {
-          alert("Sessão expirada. Faça login novamente.");
-          window.location.href = './login_empresa.html';
-          return;
-        }
-
-        const novoStatus = empresa.status === 'Aberta' ? 'Fechada' : 'Aberta';
+        const novoStatus = empresaLogada.status === 'Aberta' ? 'Fechada' : 'Aberta';
 
         const res = await fetch(`https://easybuniness.onrender.com/api/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: empresa.email, status: novoStatus })
+          body: JSON.stringify({ email: empresaLogada.email, status: novoStatus })
         });
 
         if (!res.ok) throw new Error('Erro ao atualizar o status');
 
-        empresa.status = novoStatus;
-        localStorage.setItem('empresa', JSON.stringify(empresa));
+        empresaLogada.status = novoStatus;
+        localStorage.setItem('empresa', JSON.stringify(empresaLogada));
 
         document.getElementById('statusEmpresa').textContent = "Status: " + novoStatus;
         alert("Status atualizado com sucesso!");
@@ -115,5 +168,21 @@
       window.location.href = './produtos.html';
     }
   </script>
+
+  <style>
+    .input-campo {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    .input-campo:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    }
+  </style>
 </body>
 </html>

@@ -128,6 +128,24 @@ app.post('/api/excluir-produto', (req, res) => {
   res.json({ mensagem: 'Produto excluído com sucesso.' });
 });
 
+app.post('/api/atualizarEmpresa', (req, res) => {
+  const { email, nome, telefone, contatos, descricao, endereco } = req.body;
+  const data = lerUsuarios();
+
+  const empresa = data.empresas.find(e => e.email === email);
+  if (!empresa) {
+    return res.status(404).json({ error: 'Empresa não encontrada.' });
+  }
+
+  empresa.nome = nome;
+  empresa.telefone = telefone;
+  empresa.contatos = contatos;
+  empresa.descricao = descricao;
+  empresa.endereco = endereco;
+
+  salvarUsuarios(data);
+  res.json({ mensagem: 'Empresa atualizada com sucesso.' });
+});
 // =====================================
 // 👤 ROTAS DE USUÁRIO (Pessoas físicas)
 // =====================================
