@@ -19,6 +19,7 @@
 
       <button type="submit">Entrar</button>
     </form>
+
     <button onclick="window.location.href='index.html'" style="margin-top: 10px;">Voltar</button>
 
     <p id="mensagem" style="color: red; font-weight: bold;"></p>
@@ -39,9 +40,9 @@
       }
 
       try {
-        const res = await fetch(`https://easybuniness.onrender.com/login-usuario`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const res = await fetch('https://easybuniness.onrender.com/login-usuario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, senha })
         });
 
@@ -49,7 +50,7 @@
 
         if (res.ok && data.success) {
           localStorage.setItem("usuario", JSON.stringify(data.usuario));
-          window.location.href = "dashboard_pessoa.html";
+          window.location.href = "dashboard_pessoa.html";  // Redirecionar para o painel do usuário
         } else {
           mensagem.textContent = "Email ou senha inválidos.";
         }
