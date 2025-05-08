@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - Pessoa</title>
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+  <main>
+    <h2>Login - Pessoa</h2>
+
+    <form id="loginForm" autocomplete="on">
+      <label for="email">Email:</label><br>
+      <input type="email" id="email" name="email" placeholder="Digite seu email" required /><br>
+
+      <label for="senha">Senha:</label><br>
+      <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required /><br>
+
+      <button type="submit">Entrar</button>
+    </form>
+    <button onclick="window.location.href='index.html'" style="margin-top: 10px;">Voltar</button>
+
+    <p id="mensagem" style="color: red; font-weight: bold;"></p>
+    <p>Não tem conta? <a href="cadastro_pessoa.html">Cadastre-se</a></p>
+  </main>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+      const mensagem = document.getElementById("mensagem");
+
+      if (!email || !senha) {
+        mensagem.textContent = "Preencha todos os campos.";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:3000/login-usuario", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          localStorage.setItem("usuario", JSON.stringify(data.usuario));
+          window.location.href = "dashboard_pessoa.html";
+        } else {
+          mensagem.textContent = "Email ou senha inválidos.";
+        }
+      } catch (err) {
+        console.error(err);
+        mensagem.textContent = "Erro ao conectar com o servidor.";
+      }
+    });
+  </script>
+</body>
+</html>

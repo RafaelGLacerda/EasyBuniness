@@ -1,49 +1,25 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Login da Empresa</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>EasyBusiness - Início</title>
+  <link rel="stylesheet" href="css/index.css" />
+
 </head>
 <body>
-  <h1>Login da Empresa</h1>
-  <form id="formLogin">
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="senha" placeholder="Senha" required><br>
-    <button type="submit">Entrar</button>
-  </form>
-
-  <p id="mensagem"></p>
-  <p><a href="cadastro.html">Não tem cadastro? Clique aqui</a></p>
+  <h1>Bem-vindo ao EasyBusiness</h1>
+  <p>Você é uma:</p>
+  <button id="btnPessoa">Pessoa</button>
+  <button id="btnEmpresa">Empresa</button>
 
   <script>
-    const form = document.getElementById('formLogin');
-    const mensagem = document.getElementById('mensagem');
+    document.getElementById("btnPessoa").addEventListener("click", () => {
+      window.location.href = "login_pessoa.html";
+    });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById('email').value;
-      const senha = document.getElementById('senha').value;
-
-      try {
-        const res = await fetch('http://localhost:3000/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          localStorage.setItem('empresa', JSON.stringify(data.empresa));
-          window.location.href = 'dashboard.html';
-        } else {
-          mensagem.textContent = data.error || 'Erro ao fazer login.';
-        }
-      } catch (err) {
-        mensagem.textContent = 'Erro de conexão com o servidor.';
-      }
+    document.getElementById("btnEmpresa").addEventListener("click", () => {
+      window.location.href = "login_empresa.html"; // já existente
     });
   </script>
 </body>

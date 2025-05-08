@@ -1,0 +1,51 @@
+/* dashboard_pessoa.css */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #8b9add, #11e1dd);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h2 {
+  margin: 30px 0 20px;
+  color: #2c3e50;
+  font-size: 2rem;
+}
+
+#empresasContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.empresa-card {
+  background: linear-gradient(to right, #43cea2, #185a9d);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.empresa-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+}
+
+.empresa-card h3 {
+  margin-top: 0;
+  color: #34495e;
+  font-size: 1.3rem;
+}
+
+.empresa-card p {
+  color: #666;
+  margin: 8px 0;
+  font-size: 0.95rem;
+}

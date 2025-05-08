@@ -1,0 +1,88 @@
+/* produtos.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #43cea2, #185a9d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #fff;
+  }
+  
+  .dashboard-container {
+    width: 95%;
+    max-width: 900px;
+    background: linear-gradient(to right, #8b9add, #11e1dd);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
+  
+  h1, h2 {
+    margin-bottom: 20px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="file"] {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+  }
+  
+  input::placeholder {
+    color: #777;
+  }
+  
+  button {
+    background-color: #fff;
+    color: #185a9d;
+    font-size: 1rem;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  
+  button:hover {
+    background-color: #e6e6e6;
+    transform: scale(1.03);
+  }
+  
+  #listaProdutos {
+    text-align: left;
+  }
+  
+  .produto {
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .produto img {
+    margin-top: 10px;
+    max-width: 150px;
+    border-radius: 8px;
+  }
+  
+  .produto button {
+    margin-right: 10px;
+    margin-top: 10px;
+  }
+  

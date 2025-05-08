@@ -2,28 +2,31 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gerenciar Produtos</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/produtos.css" />
 </head>
 <body>
   <div class="dashboard-container">
     <h1>Produtos da Empresa</h1>
+
     <form id="formProduto">
-      <input type="text" id="nome" placeholder="Nome do produto" required><br>
-      <input id="descricao" placeholder="Descrição" required><br>
-      <input type="number" id="preco" placeholder="Preço" step="0.01" required><br>
-      <input type="file" id="imagem" accept="image/*"><br>
+      <input type="text" id="nome" placeholder="Nome do produto" required /><br>
+      <input type="text" id="descricao" placeholder="Descrição" required /><br>
+      <input type="number" id="preco" placeholder="Preço" step="0.01" required /><br>
+      <input type="file" id="imagem" accept="image/*" /><br>
       <button type="submit" id="btnSubmit">Adicionar Produto</button>
     </form>
 
     <h2>Lista de Produtos</h2>
     <div id="listaProdutos"></div>
+
     <br>
     <button onclick="voltar()">Voltar ao Dashboard</button>
   </div>
 
   <script>
-    const empresa = JSON.parse(localStorage.getItem('empresa'));
+    let empresa = JSON.parse(localStorage.getItem('empresa'));
     if (!empresa) {
       alert('Faça login primeiro.');
       window.location.href = 'index.html';
@@ -32,10 +35,11 @@
     const form = document.getElementById('formProduto');
     const lista = document.getElementById('listaProdutos');
     const btnSubmit = document.getElementById('btnSubmit');
-    let editIndex = localStorage.getItem('produtoEdit');
+    const editIndex = localStorage.getItem('produtoEdit');
     let isEditing = editIndex !== null;
 
-    // Preencher campos se for edição
+    if (!empresa.produtos) empresa.produtos = [];
+
     if (isEditing) {
       const produto = empresa.produtos[editIndex];
       document.getElementById('nome').value = produto.nome;
@@ -46,58 +50,95 @@
 
     function renderizarProdutos() {
       lista.innerHTML = '';
-      if (!empresa.produtos || empresa.produtos.length === 0) {
+      empresa = JSON.parse(localStorage.getItem('empresa'));
+      const produtos = empresa.produtos || [];
+
+      if (produtos.length === 0) {
         lista.innerHTML = '<p>Nenhum produto cadastrado.</p>';
         return;
       }
 
-      empresa.produtos.forEach(prod => {
+      produtos.forEach((prod, index) => {
         const div = document.createElement('div');
+        div.className = 'produto';
         div.innerHTML = `
           <h3>${prod.nome}</h3>
           <p>${prod.descricao}</p>
-          <p>Preço: R$ ${prod.preco.toFixed(2)}</p>
+          <p>Preço: R$ ${parseFloat(prod.preco).toFixed(2)}</p>
           <img src="${prod.imagem}" alt="${prod.nome}" width="150" />
+          <button onclick="editarProduto(${index})">Editar</button>
+          <button onclick="excluirProduto(${index})">Excluir</button>
           <hr>
         `;
         lista.appendChild(div);
       });
     }
 
+    function editarProduto(index) {
+      localStorage.setItem('produtoEdit', index);
+      window.location.reload();
+    }
+
+    function excluirProduto(index) {
+      if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+
+      fetch('http://localhost:3000/api/excluir-produto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: empresa.email, index })
+      })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(() => {
+        empresa.produtos.splice(index, 1);
+        localStorage.setItem('empresa', JSON.stringify(empresa));
+        renderizarProdutos();
+      })
+      .catch(() => alert('Erro ao excluir o produto.'));
+    }
+
+    function voltar() {
+      localStorage.removeItem('produtoEdit');
+      window.location.href = 'dashboard_empresa.html';
+    }
+
     renderizarProdutos();
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const nome = document.getElementById('nome').value;
-      const descricao = document.getElementById('descricao').value;
+
+      const nome = document.getElementById('nome').value.trim();
+      const descricao = document.getElementById('descricao').value.trim();
       const preco = parseFloat(document.getElementById('preco').value);
       const file = document.getElementById('imagem').files[0];
 
-      function salvar(produtoAtualizado) {
+      if (!nome || !descricao || isNaN(preco)) {
+        alert('Preencha todos os campos corretamente.');
+        return;
+      }
+
+      function salvar(produto) {
         const rota = isEditing ? 'editar-produto' : 'adicionar-produto';
+
         fetch(`http://localhost:3000/api/${rota}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(produtoAtualizado)
+          body: JSON.stringify(produto)
         })
-        .then(res => {
-          if (res.ok) {
-            if (isEditing) {
-              empresa.produtos[editIndex] = { ...produtoAtualizado, imagem: produtoAtualizado.imagem };
-              localStorage.removeItem('produtoEdit');
-            } else {
-              empresa.produtos.push({ ...produtoAtualizado });
-            }
-            localStorage.setItem('empresa', JSON.stringify(empresa));
-            renderizarProdutos();
-            form.reset();
-            btnSubmit.textContent = 'Adicionar Produto';
-            isEditing = false;
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(() => {
+          if (isEditing) {
+            empresa.produtos[editIndex] = { ...produto };
+            localStorage.removeItem('produtoEdit');
           } else {
-            alert('Erro ao salvar o produto.');
+            empresa.produtos.push({ ...produto });
           }
+          localStorage.setItem('empresa', JSON.stringify(empresa));
+          form.reset();
+          isEditing = false;
+          btnSubmit.textContent = 'Adicionar Produto';
+          renderizarProdutos();
         })
-        .catch(() => alert('Erro de conexão com o servidor.'));
+        .catch(() => alert('Erro ao salvar o produto.'));
       }
 
       if (file) {
@@ -106,28 +147,28 @@
           const imagem = reader.result;
           const produto = {
             email: empresa.email,
-            nome, descricao, preco, imagem,
+            nome,
+            descricao,
+            preco,
+            imagem,
             index: isEditing ? parseInt(editIndex) : undefined
           };
           salvar(produto);
         };
         reader.readAsDataURL(file);
       } else {
-        // Se não alterar imagem na edição
         const imagem = isEditing ? empresa.produtos[editIndex].imagem : '';
         const produto = {
           email: empresa.email,
-          nome, descricao, preco, imagem,
+          nome,
+          descricao,
+          preco,
+          imagem,
           index: isEditing ? parseInt(editIndex) : undefined
         };
         salvar(produto);
       }
     });
-
-    function voltar() {
-      localStorage.removeItem('produtoEdit');
-      window.location.href = 'dashboard.html';
-    }
   </script>
 </body>
 </html>

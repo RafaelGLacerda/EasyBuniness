@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Empresa</title>
+  <link rel="stylesheet" href="css/dashboard_empresa.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <button class="logout-btn" onclick="logout()">Sair</button>
+
+    <div class="top-section">
+      <div class="empresa-info">
+        <h2 id="nomeEmpresa">Empresa</h2>
+        <p id="emailEmpresa">Email:</p>
+        <p id="statusEmpresa">Status:</p>
+        <button class="logout-btn" onclick="alterarStatus()">Alterar status</button>
+      </div>
+
+      <div class="add-produto-container">
+        <button onclick="adicionarProduto()">Adicionar Produto</button>
+      </div>
+    </div>
+
+    <h2>Produtos da empresa</h2>
+    <p id="qtdProdutos">Quantidade: 0</p>
+
+    <div id="listaProdutos" class="produtos-grid"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const empresaLogada = JSON.parse(localStorage.getItem('empresa'));
+      if (!empresaLogada) {
+        alert("Faça login primeiro.");
+        window.location.href = './login_empresa.html';
+        return;
+      }
+
+      const nomeEmpresa = document.getElementById('nomeEmpresa');
+      const emailEmpresa = document.getElementById('emailEmpresa');
+      const statusEmpresa = document.getElementById('statusEmpresa');
+      const qtdProdutos = document.getElementById('qtdProdutos');
+      const listaProdutos = document.getElementById('listaProdutos');
+
+      nomeEmpresa.textContent = empresaLogada.nome || "Sem nome";
+      emailEmpresa.textContent = "Email: " + (empresaLogada.email || "Sem email");
+      statusEmpresa.textContent = "Status: " + (empresaLogada.status || "Indefinido");
+
+      const produtos = empresaLogada.produtos || [];
+      qtdProdutos.textContent = "Quantidade: " + produtos.length;
+
+      produtos.forEach((produto, index) => {
+        const card = document.createElement('div');
+        card.className = 'produto-card';
+        card.innerHTML = `
+          <div class="produto-img-container">
+            <img src="${produto.imagem}" alt="${produto.nome}" class="produto-img" />
+          </div>
+          <h3>${produto.nome}</h3>
+          <p>Descrição: ${produto.descricao}</p>
+          <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
+          <button onclick="editarProduto(${index})">Editar</button>
+        `;
+        listaProdutos.appendChild(card);
+      });
+    });
+
+    function logout() {
+      localStorage.removeItem('empresa');
+      window.location.href = './index.html';
+    }
+
+    async function alterarStatus() {
+      try {
+        const empresa = JSON.parse(localStorage.getItem('empresa'));
+        if (!empresa) {
+          alert("Sessão expirada. Faça login novamente.");
+          window.location.href = './login_empresa.html';
+          return;
+        }
+    
+        const novoStatus = empresa.status === 'Aberta' ? 'Fechada' : 'Aberta';
+    
+        const res = await fetch('http://localhost:3000/api/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: empresa.email, status: novoStatus })
+        });
+    
+        if (!res.ok) throw new Error('Erro ao atualizar o status');
+    
+        empresa.status = novoStatus;
+        localStorage.setItem('empresa', JSON.stringify(empresa));
+    
+        document.getElementById('statusEmpresa').textContent = "Status: " + novoStatus;
+        alert("Status atualizado com sucesso!");
+      } catch (error) {
+        console.error(error);
+        alert("Falha ao alterar o status. Tente novamente.");
+      }
+    }
+    
+
+    function editarProduto(index) {
+      localStorage.setItem('produtoEdit', index);
+      window.location.href = './produtos.html';
+    }
+
+    function adicionarProduto() {
+      window.location.href = './produtos.html';
+    }
+  </script>
+</body>  
+</html>

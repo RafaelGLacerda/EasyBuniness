@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cadastro Pessoa</title>
+  <link rel="stylesheet" href="css/cadastro.css" />
+</head>
+<body>
+  <h2>Cadastro - Pessoa</h2>
+  <form id="cadastroForm">
+    <input type="text" id="nome" placeholder="Nome completo" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="senha" placeholder="Senha" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+    <h3>Empresas Cadastradas</h3>
+    <div id="empresasContainer"></div>
+    <button onclick="window.location.href='login_pessoa.html'" style="margin-top: 10px;">Voltar para Login</button>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById("empresasContainer");
+  
+      try {
+        const res = await fetch("http://localhost:3000/empresas");
+        if (!res.ok) throw new Error("Erro ao buscar empresas");
+  
+        const empresas = await res.json();
+  
+        if (!empresas.length) {
+          container.innerHTML = "<p>Nenhuma empresa cadastrada.</p>";
+          return;
+        }
+  
+        empresas.forEach((empresa) => {
+          const card = document.createElement("div");
+          card.classList.add("empresa-card");
+  
+          card.innerHTML = `
+            <h3>${empresa.nome}</h3>
+            <p>Status: ${empresa.status}</p>
+            <p>Email: ${empresa.email}</p>
+          `;
+  
+          // Salva o email da empresa clicada
+          card.addEventListener("click", () => {
+            localStorage.setItem("empresaVisualizada", empresa.email);
+            window.location.href = "empresa_info.html";
+          });
+  
+          container.appendChild(card);
+        });
+  
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = "<p>Erro ao carregar as empresas. Tente novamente mais tarde.</p>";
+      }
+    });
+  </script>
+  
+</body>
+</html>

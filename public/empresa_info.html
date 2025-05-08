@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Informações da Empresa</title>
+  <link rel="stylesheet" href="css/dashboard_empresa.css">
+  <style>
+    .readonly {
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .produto-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <a href="dashboard_pessoa.html" class="logout-btn">Voltar</a>
+
+    <div class="top-section">
+      <div class="empresa-info">
+        <h2 id="nomeEmpresa">Empresa</h2>
+        <p id="emailEmpresa">Email:</p>
+        <p id="statusEmpresa">Status:</p>
+      </div>
+    </div>
+
+    <h2>Produtos da empresa</h2>
+    <p id="qtdProdutos">Quantidade: 0</p>
+    <div id="listaProdutos" class="produtos-grid"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const empresaId = localStorage.getItem('empresaVisualizada');
+  
+      if (!empresaId) {
+        alert('Nenhuma empresa selecionada.');
+        window.location.href = 'dashboard_pessoa.html';
+        return;
+      }
+  
+      try {
+        const res = await fetch(`http://localhost:3000/empresas/${empresaId}`);
+        if (!res.ok) throw new Error('Erro ao buscar empresa');
+  
+        const empresa = await res.json();
+  
+        document.getElementById('nomeEmpresa').textContent = empresa.nome || "Sem nome";
+        document.getElementById('emailEmpresa').textContent = "Email: " + (empresa.email || "Sem email");
+        document.getElementById('statusEmpresa').textContent = "Status: " + (empresa.status || "Indefinido");
+  
+        const produtos = empresa.produtos || [];
+        document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
+  
+        const listaProdutos = document.getElementById('listaProdutos');
+  
+        produtos.forEach(produto => {
+          const card = document.createElement('div');
+          card.className = 'produto-card';
+          card.innerHTML = `
+            <h3>${produto.nome}</h3>
+            <p>Descrição: ${produto.descricao}</p>
+            <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
+            <img src="${produto.imagem}" alt="Imagem do produto" style="width: 100%; height: auto; border-radius: 8px;">
+          `;
+          listaProdutos.appendChild(card);
+        });
+  
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao carregar informações da empresa.');
+        window.location.href = 'dashboard_pessoa.html';
+      }
+    });
+  </script>
+</body>
+</html>

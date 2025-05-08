@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Pessoa</title>
+  <link rel="stylesheet" href="css/dashboard_pessoa.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .empresa-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .empresa-card:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <button class="logout-btn" onclick="logout()">Sair</button>
+  <h2>Empresas Cadastradas</h2>
+  <div id="empresasContainer"></div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem('usuario');
+      window.location.href = './index.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const container = document.getElementById("empresasContainer");
+
+      try {
+        const res = await fetch("http://localhost:3000/empresas");
+        if (!res.ok) throw new Error("Erro ao buscar empresas");
+
+        const empresas = await res.json();
+
+        if (!empresas.length) {
+          container.innerHTML = "<p>Nenhuma empresa cadastrada.</p>";
+          return;
+        }
+
+        empresas.forEach((empresa, index) => {
+          const card = document.createElement("div");
+          card.classList.add("empresa-card");
+
+          card.innerHTML = `
+            <h3>${empresa.nome}</h3>
+            <p>Status: ${empresa.status || "Indefinido"}</p>
+            <p>Email: ${empresa.email}</p>
+          `;
+
+          card.addEventListener("click", () => {
+            localStorage.setItem("empresaVisualizada", index);
+            window.location.href = "empresa_info.html";
+          });
+
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("Erro ao buscar empresas:", err);
+        container.innerHTML = "<p style='color:red;'>Erro ao carregar as empresas. Tente novamente mais tarde.</p>";
+      }
+    });
+  </script>
+</body>
+</html>
