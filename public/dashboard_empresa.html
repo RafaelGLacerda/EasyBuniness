@@ -15,6 +15,10 @@
         <h2 id="nomeEmpresa">Empresa</h2>
         <p id="emailEmpresa">Email:</p>
         <p id="statusEmpresa">Status:</p>
+        <p id="descricaoEmpresa">Descrição:</p>
+        <p id="enderecoEmpresa">Endereço:</p>
+        <p id="contatosEmpresa">Contatos:</p>
+        <p id="telefoneEmpresa">Telefone:</p>
         <button class="logout-btn" onclick="alterarStatus()">Alterar status</button>
       </div>
 
@@ -38,19 +42,19 @@
         return;
       }
 
-      const nomeEmpresa = document.getElementById('nomeEmpresa');
-      const emailEmpresa = document.getElementById('emailEmpresa');
-      const statusEmpresa = document.getElementById('statusEmpresa');
-      const qtdProdutos = document.getElementById('qtdProdutos');
-      const listaProdutos = document.getElementById('listaProdutos');
-
-      nomeEmpresa.textContent = empresaLogada.nome || "Sem nome";
-      emailEmpresa.textContent = "Email: " + (empresaLogada.email || "Sem email");
-      statusEmpresa.textContent = "Status: " + (empresaLogada.status || "Indefinido");
+      // Elementos do DOM
+      document.getElementById('nomeEmpresa').textContent = empresaLogada.nome || "Sem nome";
+      document.getElementById('emailEmpresa').textContent = "Email: " + (empresaLogada.email || "Sem email");
+      document.getElementById('statusEmpresa').textContent = "Status: " + (empresaLogada.status || "Indefinido");
+      document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresaLogada.descricao || "Não informada");
+      document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresaLogada.endereco || "Não informado");
+      document.getElementById('contatosEmpresa').textContent = "Contatos: " + (empresaLogada.contatos || "Não informados");
+      document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresaLogada.telefone || "Não informado");
 
       const produtos = empresaLogada.produtos || [];
-      qtdProdutos.textContent = "Quantidade: " + produtos.length;
+      document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
 
+      const listaProdutos = document.getElementById('listaProdutos');
       produtos.forEach((produto, index) => {
         const card = document.createElement('div');
         card.className = 'produto-card';
@@ -80,20 +84,20 @@
           window.location.href = './login_empresa.html';
           return;
         }
-    
+
         const novoStatus = empresa.status === 'Aberta' ? 'Fechada' : 'Aberta';
-    
+
         const res = await fetch(`https://easybuniness.onrender.com/api/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: empresa.email, status: novoStatus })
         });
-    
+
         if (!res.ok) throw new Error('Erro ao atualizar o status');
-    
+
         empresa.status = novoStatus;
         localStorage.setItem('empresa', JSON.stringify(empresa));
-    
+
         document.getElementById('statusEmpresa').textContent = "Status: " + novoStatus;
         alert("Status atualizado com sucesso!");
       } catch (error) {
@@ -101,7 +105,6 @@
         alert("Falha ao alterar o status. Tente novamente.");
       }
     }
-    
 
     function editarProduto(index) {
       localStorage.setItem('produtoEdit', index);
@@ -112,5 +115,5 @@
       window.location.href = './produtos.html';
     }
   </script>
-</body>  
+</body>
 </html>

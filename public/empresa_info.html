@@ -17,6 +17,12 @@
       margin: 10px 0;
       background-color: #f9f9f9;
     }
+    .empresa-info p {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* Adicionando sombra */
+    }
   </style>
 </head>
 <body>
@@ -25,9 +31,13 @@
 
     <div class="top-section">
       <div class="empresa-info">
-        <h2 id="nomeEmpresa">Empresa</h2>
+        <h2 id="nomeEmpresa">Nome da Empresa</h2>
         <p id="emailEmpresa">Email:</p>
         <p id="statusEmpresa">Status:</p>
+        <p id="telefoneEmpresa">Telefone:</p> <!-- Novo campo -->
+        <p id="enderecoEmpresa">Endereço:</p> <!-- Novo campo -->
+        <p id="contatoEmpresa">Contato:</p> <!-- Novo campo -->
+        <p id="descricaoEmpresa">Descrição:</p> <!-- Novo campo -->
       </div>
     </div>
 
@@ -52,9 +62,14 @@
   
         const empresa = await res.json();
   
+        // Preenche os detalhes da empresa
         document.getElementById('nomeEmpresa').textContent = empresa.nome || "Sem nome";
         document.getElementById('emailEmpresa').textContent = "Email: " + (empresa.email || "Sem email");
         document.getElementById('statusEmpresa').textContent = "Status: " + (empresa.status || "Indefinido");
+        document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresa.telefone || "Sem telefone"); // Novo campo
+        document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresa.endereco || "Sem endereço"); // Novo campo
+        document.getElementById('contatoEmpresa').textContent = "Contato: " + (empresa.contato || "Sem contato"); // Novo campo
+        document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresa.descricao || "Sem descrição"); // Novo campo
   
         const produtos = empresa.produtos || [];
         document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
@@ -64,7 +79,7 @@
         produtos.forEach(produto => {
           const card = document.createElement('div');
           card.className = 'produto-card';
-          card.innerHTML = `
+          card.innerHTML = ` 
             <h3>${produto.nome}</h3>
             <p>Descrição: ${produto.descricao}</p>
             <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
