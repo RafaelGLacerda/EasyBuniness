@@ -7,6 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000; // ← Obrigatório para o Render
 const USERS_FILE = path.join(__dirname, 'users.json');
 
+// Permite acesso a arquivos estáticos (HTML, CSS, JS, imagens) na pasta public
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -189,6 +190,14 @@ app.get('/empresa-por-email/:email', (req, res) => {
 
   const { senha, ...empresaSemSenha } = empresa;
   res.json(empresaSemSenha);
+});
+
+// =====================================
+// ROTA PARA SERVIR O INDEX HTML
+// =====================================
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // =====================================

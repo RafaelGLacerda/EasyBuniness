@@ -1,11 +1,10 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <title>EasyBusiness - Início</title>
-  <link rel="stylesheet" href="css/index.css" />
-
+  <!-- Ajuste no caminho do CSS -->
+  <link rel="stylesheet" href="/css/index.css" />
 </head>
 <body>
   <h1>Bem-vindo ao EasyBusiness</h1>
@@ -15,11 +14,11 @@
 
   <script>
     document.getElementById("btnPessoa").addEventListener("click", () => {
-      window.location.href = "login_pessoa.html";
+      window.location.href = "login_pessoa.html"; // Garantir que login_pessoa.html esteja na pasta public
     });
 
     document.getElementById("btnEmpresa").addEventListener("click", () => {
-      window.location.href = "login_empresa.html"; // já existente
+      window.location.href = "login_empresa.html"; // Garantir que login_empresa.html esteja na pasta public
     });
   </script>
 </body>
