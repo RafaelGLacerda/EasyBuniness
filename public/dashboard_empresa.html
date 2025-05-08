@@ -83,7 +83,7 @@
     
         const novoStatus = empresa.status === 'Aberta' ? 'Fechada' : 'Aberta';
     
-        const res = await fetch('https://easybuniness.onrender.com/api/status', {
+        const res = await fetch(`https://easybuniness.onrender.com/api/status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: empresa.email, status: novoStatus })
