@@ -65,7 +65,7 @@ app.post('/api/login', (req, res) => {
   const index = data.empresas.findIndex(e => e.email === email);
   res.json({ empresa, index });
 });
-
+3
 app.post('/api/status', (req, res) => {
   const { email, status } = req.body;
   const data = lerUsuarios();
@@ -132,20 +132,25 @@ app.post('/api/atualizarEmpresa', (req, res) => {
   const { email, nome, telefone, contatos, descricao, endereco } = req.body;
   const data = lerUsuarios();
 
-  const empresa = data.empresas.find(e => e.email === email);
-  if (!empresa) {
+  const index = data.empresas.findIndex(e => e.email === email);
+  if (index === -1) {
     return res.status(404).json({ error: 'Empresa não encontrada.' });
   }
 
-  empresa.nome = nome;
-  empresa.telefone = telefone;
-  empresa.contatos = contatos;
-  empresa.descricao = descricao;
-  empresa.endereco = endereco;
+  // Atualiza diretamente os campos
+  data.empresas[index] = {
+    ...data.empresas[index],
+    nome,
+    telefone,
+    contatos,
+    descricao,
+    endereco
+  };
 
   salvarUsuarios(data);
   res.json({ mensagem: 'Empresa atualizada com sucesso.' });
 });
+
 // =====================================
 // 👤 ROTAS DE USUÁRIO (Pessoas físicas)
 // =====================================

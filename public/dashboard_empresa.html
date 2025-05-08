@@ -105,31 +105,51 @@
       }
     }
 
-    async function salvarEdicao() {
-  empresaLogada.nome = document.getElementById('editNome').value.trim();
-  empresaLogada.telefone = document.getElementById('editTelefone').value.trim();
-  empresaLogada.contatos = document.getElementById('editContatos').value.trim();
-  empresaLogada.descricao = document.getElementById('editDescricao').value.trim();
-  empresaLogada.endereco = document.getElementById('editEndereco').value.trim();
+ async function salvarEdicao() {
+  const nome = document.getElementById('editNome').value.trim();
+  const telefone = document.getElementById('editTelefone').value.trim();
+  const contatos = document.getElementById('editContatos').value.trim();
+  const descricao = document.getElementById('editDescricao').value.trim();
+  const endereco = document.getElementById('editEndereco').value.trim();
+
+  if (!nome && !telefone && !contatos && !descricao && !endereco) {
+    alert("Preencha pelo menos um campo.");
+    return;
+  }
+
+  const body = {
+    email: empresaLogada.email, // importante manter o email original
+    nome,
+    telefone,
+    contatos,
+    descricao,
+    endereco
+  };
 
   try {
     const res = await fetch('https://easybuniness.onrender.com/api/atualizarEmpresa', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(empresaLogada)
+      body: JSON.stringify(body)
     });
 
-    if (!res.ok) throw new Error('Erro ao salvar dados no servidor');
+    const data = await res.json();
 
+    if (!res.ok) throw new Error(data.error || "Erro ao salvar dados");
+
+    // Atualiza os dados locais e no localStorage
+    Object.assign(empresaLogada, body);
     localStorage.setItem('empresa', JSON.stringify(empresaLogada));
+
     atualizarDadosEmpresa();
     document.getElementById('formEdicao').style.display = "none";
     alert("Dados atualizados com sucesso!");
   } catch (err) {
     console.error(err);
-    alert("Erro ao salvar no servidor.");
+    alert("Erro ao salvar no servidor: " + err.message);
   }
 }
+
 
     function logout() {
       localStorage.removeItem('empresa');
