@@ -82,7 +82,7 @@
     function excluirProduto(index) {
       if (!confirm('Tem certeza que deseja excluir este produto?')) return;
 
-      fetch('http://localhost:3000/api/excluir-produto', {
+      fetch('https://easybuniness.onrender.com/api/excluir-produto', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: empresa.email, index })
@@ -119,7 +119,7 @@
       function salvar(produto) {
         const rota = isEditing ? 'editar-produto' : 'adicionar-produto';
 
-        fetch(`http://localhost:3000/api/${rota}`, {
+        fetch(`https://easybuniness.onrender.com/api/${rota}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(produto)

@@ -22,7 +22,7 @@
       const container = document.getElementById("empresasContainer");
   
       try {
-        const res = await fetch("http://localhost:3000/empresas");
+        const res = await fetch("https://easybuniness.onrender.com/empresas");
         if (!res.ok) throw new Error("Erro ao buscar empresas");
   
         const empresas = await res.json();

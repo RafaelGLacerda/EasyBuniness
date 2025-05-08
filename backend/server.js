@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // ← Obrigatório para o Render
 const USERS_FILE = path.join(__dirname, 'users.json');
 
 app.use(cors());
@@ -195,5 +195,5 @@ app.get('/empresa-por-email/:email', (req, res) => {
 // 🚀 INICIAR SERVIDOR
 // =====================================
 app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando em: http://localhost:${PORT}`);
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
 });

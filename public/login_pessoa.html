@@ -39,7 +39,7 @@
       }
 
       try {
-        const res = await fetch("http://localhost:3000/login-usuario", {
+        const res = await fetch("https://easybuniness.onrender.com/login-usuario", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, senha })

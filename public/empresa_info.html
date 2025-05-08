@@ -47,7 +47,7 @@
       }
   
       try {
-        const res = await fetch(`http://localhost:3000/empresas/${empresaId}`);
+        const res = await fetch(`https://easybuniness.onrender.com/empresas/${empresaId}`);
         if (!res.ok) throw new Error('Erro ao buscar empresa');
   
         const empresa = await res.json();
