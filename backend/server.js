@@ -10,7 +10,7 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 // Permite acesso a arquivos estáticos (HTML, CSS, JS, imagens) na pasta public
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public'))); // Ajustado o caminho para a pasta public
 
 // =====================================
 // 🔧 Funções utilitárias
@@ -197,7 +197,7 @@ app.get('/empresa-por-email/:email', (req, res) => {
 // =====================================
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../public', 'index.html')); // Atualizado o caminho para servir o index.html da pasta public
 });
 
 // =====================================
