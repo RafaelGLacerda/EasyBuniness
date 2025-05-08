@@ -49,7 +49,7 @@
         mensagem.textContent = res.ok ? 'Cadastro realizado com sucesso!' : (data.error || 'Erro ao cadastrar.');
 
         if (res.ok) {
-          setTimeout(() => window.location.href = 'index.html', 1000);
+          setTimeout(() => window.location.href = 'login_empresa.html', 1000);
         }
       } catch (err) {
         mensagem.textContent = 'Erro de conexão com o servidor.';
