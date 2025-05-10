@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil do Usuário</title>
+  <link rel="stylesheet" href="css/perfil_pessoa.css">
+</head>
+<body>
+  <div class="top-bar">
+    <div class="user-info">
+      <div class="user-icon">👤</div>
+      <span id="userName">Usuário</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Voltar</button>
+  </div>
+
+  <h2>Perfil</h2>
+  <form id="perfilForm">
+    <label>Nome:</label><br>
+    <input type="text" id="nome" required><br><br>
+
+    <label>Telefone:</label><br>
+    <input type="text" id="telefone"><br><br>
+
+    <label>Contato:</label><br>
+    <input type="text" id="contato"><br><br>
+
+    <button type="submit">Salvar Informações</button>
+  </form>
+
+  <p id="mensagem" style="color: green;"></p>
+
+  <script>
+    function logout() {
+      window.location.href = './dashboard_pessoa.html';
+    }
+
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (!usuario) {
+      window.location.href = './index.html';
+    }
+
+    document.getElementById('userName').textContent = usuario.nome || 'Usuário';
+
+    // Preenche os campos com os dados atuais
+    document.getElementById('nome').value = usuario.nome || '';
+    document.getElementById('telefone').value = usuario.telefone || '';
+    document.getElementById('contato').value = usuario.contato || '';
+
+    document.getElementById('perfilForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const contato = document.getElementById('contato').value.trim();
+
+      try {
+        const res = await fetch('https://easybuniness.onrender.com/api/atualizarPessoa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: usuario.email, nome, telefone, contato })
+        });
+
+        const data = await res.json();
+        console.log('Resposta da API:', data);
+
+        if (res.ok) {
+          // Atualiza os dados no localStorage
+          usuario.nome = nome;
+          usuario.telefone = telefone;
+          usuario.contato = contato;
+          localStorage.setItem('usuario', JSON.stringify(usuario));
+
+          document.getElementById('mensagem').style.color = 'green';
+          document.getElementById('mensagem').textContent = 'Informações atualizadas com sucesso.';
+        } else {
+          document.getElementById('mensagem').style.color = 'red';
+          document.getElementById('mensagem').textContent = data.error || 'Erro ao atualizar.';
+        }
+      } catch (err) {
+        console.error('Erro ao salvar perfil:', err);
+        document.getElementById('mensagem').style.color = 'red';
+        document.getElementById('mensagem').textContent = 'Erro de conexão com o servidor.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -18,6 +18,8 @@
       <button type="submit" id="btnSubmit">Adicionar Produto</button>
     </form>
 
+    <p id="mensagem" style="font-weight: bold; margin-top: 10px;"></p>
+
     <h2>Lista de Produtos</h2>
     <div id="listaProdutos"></div>
 
@@ -35,6 +37,7 @@
     const form = document.getElementById('formProduto');
     const lista = document.getElementById('listaProdutos');
     const btnSubmit = document.getElementById('btnSubmit');
+    const mensagemEl = document.getElementById('mensagem');
     const editIndex = localStorage.getItem('produtoEdit');
     let isEditing = editIndex !== null;
 
@@ -92,8 +95,13 @@
         empresa.produtos.splice(index, 1);
         localStorage.setItem('empresa', JSON.stringify(empresa));
         renderizarProdutos();
+        mensagemEl.style.color = 'green';
+        mensagemEl.textContent = 'Produto excluído com sucesso.';
       })
-      .catch(() => alert('Erro ao excluir o produto.'));
+      .catch(() => {
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = 'Erro ao excluir o produto.';
+      });
     }
 
     function voltar() {
@@ -112,7 +120,8 @@
       const file = document.getElementById('imagem').files[0];
 
       if (!nome || !descricao || isNaN(preco)) {
-        alert('Preencha todos os campos corretamente.');
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = 'Preencha todos os campos corretamente.';
         return;
       }
 
@@ -137,8 +146,13 @@
           isEditing = false;
           btnSubmit.textContent = 'Adicionar Produto';
           renderizarProdutos();
+          mensagemEl.style.color = 'green';
+          mensagemEl.textContent = isEditing ? 'Produto editado com sucesso.' : 'Produto adicionado com sucesso.';
         })
-        .catch(() => alert('Erro ao salvar o produto.'));
+        .catch(() => {
+          mensagemEl.style.color = 'red';
+          mensagemEl.textContent = 'Erro ao salvar o produto.';
+        });
       }
 
       if (file) {
@@ -151,20 +165,25 @@
             descricao,
             preco,
             imagem,
-            index: isEditing ? parseInt(editIndex) : undefined
+            ...(isEditing && { index: parseInt(editIndex) })
           };
           salvar(produto);
         };
         reader.readAsDataURL(file);
       } else {
-        const imagem = isEditing ? empresa.produtos[editIndex].imagem : '';
+        const imagem = isEditing ? empresa.produtos[editIndex].imagem : null;
+        if (!imagem) {
+          mensagemEl.style.color = 'red';
+          mensagemEl.textContent = 'Selecione uma imagem para o produto.';
+          return;
+        }
         const produto = {
           email: empresa.email,
           nome,
           descricao,
           preco,
           imagem,
-          index: isEditing ? parseInt(editIndex) : undefined
+          ...(isEditing && { index: parseInt(editIndex) })
         };
         salvar(produto);
       }

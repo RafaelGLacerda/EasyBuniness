@@ -4,42 +4,36 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ← Obrigatório para o Render
+const PORT = process.env.PORT || 3000;
 const USERS_FILE = path.join(__dirname, 'users.json');
 
-// Permite acesso a arquivos estáticos (HTML, CSS, JS, imagens) na pasta public
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public'))); // Ajustado o caminho para a pasta public
+app.use(express.static(path.join(__dirname, '../public')));
 
-// =====================================
-// 🔧 Funções utilitárias
-// =====================================
+// 📁 Funções utilitárias
 function lerUsuarios() {
-  if (!fs.existsSync(USERS_FILE)) {
-    return { empresas: [], pessoas: [] };
-  }
   try {
-    const data = fs.readFileSync(USERS_FILE, 'utf8');
-    return JSON.parse(data) || { empresas: [], pessoas: [] };
-  } catch (error) {
-    console.error('Erro ao ler users.json:', error);
+    if (!fs.existsSync(USERS_FILE)) {
+      return { empresas: [], pessoas: [] };
+    }
+    const conteudo = fs.readFileSync(USERS_FILE, 'utf8');
+    return JSON.parse(conteudo);
+  } catch (err) {
+    console.error('Erro ao ler o arquivo users.json:', err);
     return { empresas: [], pessoas: [] };
   }
 }
 
-function salvarUsuarios(data) {
+function salvarUsuarios(dados) {
   try {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(data, null, 2), 'utf8');
-  } catch (error) {
-    console.error('Erro ao salvar users.json:', error);
+    fs.writeFileSync(USERS_FILE, JSON.stringify(dados, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Erro ao salvar o arquivo users.json:', err);
   }
 }
 
-// =====================================
-// 📦 ROTAS DE EMPRESA
-// =====================================
-
+// 📦 Rotas de empresa
 app.post('/api/cadastrar', (req, res) => {
   const novaEmpresa = { ...req.body, status: 'Fechada', produtos: [] };
   const data = lerUsuarios();
@@ -65,7 +59,7 @@ app.post('/api/login', (req, res) => {
   const index = data.empresas.findIndex(e => e.email === email);
   res.json({ empresa, index });
 });
-3
+
 app.post('/api/status', (req, res) => {
   const { email, status } = req.body;
   const data = lerUsuarios();
@@ -132,58 +126,103 @@ app.post('/api/atualizarEmpresa', (req, res) => {
   const { email, nome, telefone, contatos, descricao, endereco } = req.body;
   const data = lerUsuarios();
 
-  const index = data.empresas.findIndex(e => e.email === email);
-  if (index === -1) {
-    return res.status(404).json({ error: 'Empresa não encontrada.' });
+  if (!email) {
+    return res.status(400).json({ error: 'O campo \"email\" \u00e9 obrigat\u00f3rio.' });
   }
 
-  // Atualiza diretamente os campos
+  const index = data.empresas.findIndex(e => e.email === email);
+  if (index === -1) {
+    return res.status(404).json({ error: 'Empresa n\u00e3o encontrada para o email informado.' });
+  }
+
   data.empresas[index] = {
     ...data.empresas[index],
-    nome,
-    telefone,
-    contatos,
-    descricao,
-    endereco
+    nome: nome ?? data.empresas[index].nome,
+    telefone: telefone ?? data.empresas[index].telefone,
+    contatos: contatos ?? data.empresas[index].contatos,
+    descricao: descricao ?? data.empresas[index].descricao,
+    endereco: endereco ?? data.empresas[index].endereco
   };
 
   salvarUsuarios(data);
-  res.json({ mensagem: 'Empresa atualizada com sucesso.' });
+
+  res.status(200).json({
+    success: true,
+    mensagem: '🟢 Dados da empresa atualizados com sucesso.'
+  });
 });
 
-// =====================================
-// 👤 ROTAS DE USUÁRIO (Pessoas físicas)
-// =====================================
 
+// 👤 Rotas de usuário (Pessoa física)
 app.post('/cadastro-usuario', (req, res) => {
   const novoUsuario = req.body;
-  const data = lerUsuarios();
 
-  if (data.pessoas.find(u => u.email === novoUsuario.email)) {
+  if (!novoUsuario.nome || !novoUsuario.email || !novoUsuario.senha) {
+    return res.status(400).json({ error: 'Campos obrigatórios faltando.' });
+  }
+
+  const dados = lerUsuarios();
+
+  if (dados.pessoas.find(p => p.email === novoUsuario.email)) {
     return res.status(400).json({ error: 'Email já cadastrado.' });
   }
 
-  data.pessoas.push(novoUsuario);
-  salvarUsuarios(data);
+  dados.pessoas.push(novoUsuario);
+  salvarUsuarios(dados);
   res.json({ success: true, mensagem: 'Usuário cadastrado com sucesso!' });
 });
 
 app.post('/login-usuario', (req, res) => {
   const { email, senha } = req.body;
-  const data = lerUsuarios();
+  const dados = lerUsuarios();
 
-  const usuario = data.pessoas.find(u => u.email === email && u.senha === senha);
+  const usuario = dados.pessoas.find(p => p.email === email && p.senha === senha);
   if (!usuario) {
-    return res.status(401).json({ success: false, error: 'Credenciais inválidas.' });
+    return res.status(401).json({ error: 'Credenciais inválidas.' });
   }
 
   res.json({ success: true, usuario });
 });
 
-// =====================================
-// 🌐 ROTAS PÚBLICAS
-// =====================================
+app.post('/api/atualizarPessoa', (req, res) => {
+  try {
+    const { email, nome, telefone, contato } = req.body;
 
+    if (!email) {
+      return res.status(400).json({ error: 'Email é obrigatório.' });
+    }
+
+    const dados = lerUsuarios();
+
+    if (!dados || !Array.isArray(dados.pessoas)) {
+      return res.status(500).json({ error: 'Arquivo de usuários corrompido ou inválido.' });
+    }
+
+    const index = dados.pessoas.findIndex(p => p.email === email);
+    if (index === -1) {
+      return res.status(404).json({ error: 'Pessoa não encontrada.' });
+    }
+
+    const pessoaAntiga = dados.pessoas[index];
+    const pessoaAtualizada = {
+      ...pessoaAntiga,
+      nome: nome ?? pessoaAntiga.nome,
+      telefone: telefone ?? pessoaAntiga.telefone,
+      contato: contato ?? pessoaAntiga.contato
+    };
+
+    dados.pessoas[index] = pessoaAtualizada;
+
+    salvarUsuarios(dados);
+    console.log(`Pessoa atualizada: ${email}`);
+    return res.status(200).json({ mensagem: 'Pessoa atualizada com sucesso.' });
+  } catch (erro) {
+    console.error('Erro ao atualizar pessoa:', erro);
+    return res.status(500).json({ error: 'Erro interno do servidor ao atualizar os dados.' });
+  }
+});
+
+// 🌐 Rotas públicas
 app.get('/empresas', (req, res) => {
   const data = lerUsuarios();
   const empresas = data.empresas.map(({ senha, ...resto }) => resto);
@@ -215,17 +254,12 @@ app.get('/empresa-por-email/:email', (req, res) => {
   res.json(empresaSemSenha);
 });
 
-// =====================================
-// ROTA PARA SERVIR O INDEX HTML
-// =====================================
-
+// 🏁 Index
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public', 'index.html')); // Atualizado o caminho para servir o index.html da pasta public
+  res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-// =====================================
-// 🚀 INICIAR SERVIDOR
-// =====================================
+// 🚀 Iniciar servidor
 app.listen(PORT, () => {
   console.log(`✅ Servidor rodando na porta ${PORT}`);
 });

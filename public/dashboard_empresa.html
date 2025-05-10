@@ -35,6 +35,9 @@
             <button type="button" class="logout-btn" style="background-color: #28a745;" onclick="salvarEdicao()">Salvar Alterações</button>
           </div>
         </form>
+
+        <!-- Mensagem visual dinâmica -->
+        <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
       </div>
 
       <div class="add-produto-container">
@@ -54,8 +57,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       empresaLogada = JSON.parse(localStorage.getItem('empresa'));
       if (!empresaLogada) {
-        alert("Faça login primeiro.");
-        window.location.href = './login_empresa.html';
+        document.getElementById('mensagem').style.color = 'red';
+        document.getElementById('mensagem').textContent = 'Faça login primeiro.';
+        setTimeout(() => window.location.href = './login_empresa.html', 3);
         return;
       }
 
@@ -105,58 +109,58 @@
       }
     }
 
- async function salvarEdicao() {
-  const nome = document.getElementById('editNome').value.trim();
-  const telefone = document.getElementById('editTelefone').value.trim();
-  const contatos = document.getElementById('editContatos').value.trim();
-  const descricao = document.getElementById('editDescricao').value.trim();
-  const endereco = document.getElementById('editEndereco').value.trim();
+    async function salvarEdicao() {
+      const nome = document.getElementById('editNome').value.trim();
+      const telefone = document.getElementById('editTelefone').value.trim();
+      const contatos = document.getElementById('editContatos').value.trim();
+      const descricao = document.getElementById('editDescricao').value.trim();
+      const endereco = document.getElementById('editEndereco').value.trim();
+      const mensagemEl = document.getElementById('mensagem');
 
-  if (!nome && !telefone && !contatos && !descricao && !endereco) {
-    alert("Preencha pelo menos um campo.");
-    return;
-  }
+      if (!nome && !telefone && !contatos && !descricao && !endereco) {
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = "Preencha pelo menos um campo.";
+        return;
+      }
 
-  const body = {
-    email: empresaLogada.email, // importante manter o email original
-    nome,
-    telefone,
-    contatos,
-    descricao,
-    endereco
-  };
+      const body = {
+        email: empresaLogada.email,
+        nome,
+        telefone,
+        contatos,
+        descricao,
+        endereco
+      };
 
-  try {
-    const res = await fetch('https://easybuniness.onrender.com/api/atualizarEmpresa', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+      try {
+        const res = await fetch('https://easybuniness.onrender.com/api/atualizarEmpresa', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (!res.ok) throw new Error(data.error || "Erro ao salvar dados");
+        if (!res.ok) throw new Error(data.error || "Erro ao salvar dados");
 
-    // Atualiza os dados locais e no localStorage
-    Object.assign(empresaLogada, body);
-    localStorage.setItem('empresa', JSON.stringify(empresaLogada));
+        Object.assign(empresaLogada, body);
+        localStorage.setItem('empresa', JSON.stringify(empresaLogada));
 
-    atualizarDadosEmpresa();
-    document.getElementById('formEdicao').style.display = "none";
-    alert("Dados atualizados com sucesso!");
-  } catch (err) {
-    console.error(err);
-    alert("Erro ao salvar no servidor: " + err.message);
-  }
-}
+        atualizarDadosEmpresa();
+        document.getElementById('formEdicao').style.display = "none";
 
-
-    function logout() {
-      localStorage.removeItem('empresa');
-      window.location.href = './index.html';
+        mensagemEl.style.color = 'green';
+        mensagemEl.textContent = "Dados atualizados com sucesso!";
+        setTimeout(() => { mensagemEl.textContent = ''; }, 2000);
+      } catch (err) {
+        console.error(err);
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = "Erro ao salvar no servidor: " + err.message;
+      }
     }
 
     async function alterarStatus() {
+      const mensagemEl = document.getElementById('mensagem');
       try {
         const novoStatus = empresaLogada.status === 'Aberta' ? 'Fechada' : 'Aberta';
 
@@ -172,11 +176,20 @@
         localStorage.setItem('empresa', JSON.stringify(empresaLogada));
 
         document.getElementById('statusEmpresa').textContent = "Status: " + novoStatus;
-        alert("Status atualizado com sucesso!");
+
+        mensagemEl.style.color = 'green';
+        mensagemEl.textContent = "Status atualizado com sucesso!";
+        setTimeout(() => { mensagemEl.textContent = ''; }, 2000);
       } catch (error) {
         console.error(error);
-        alert("Falha ao alterar o status. Tente novamente.");
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = "Falha ao alterar o status. Tente novamente.";
       }
+    }
+
+    function logout() {
+      localStorage.removeItem('empresa');
+      window.location.href = './index.html';
     }
 
     function editarProduto(index) {

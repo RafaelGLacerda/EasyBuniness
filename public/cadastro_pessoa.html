@@ -14,52 +14,14 @@
     <button type="submit">Cadastrar</button>
   </form>
 
+  <p id="mensagem" style="font-weight: bold; margin-top: 10px;"></p>
+
   <h3>Empresas Cadastradas</h3>
   <div id="empresasContainer"></div>
   
   <button onclick="window.location.href='login_pessoa.html'" style="margin-top: 10px;">Voltar para Login</button>
 
   <script>
-    // Carregar empresas cadastradas
-    document.addEventListener('DOMContentLoaded', async () => {
-      const container = document.getElementById("empresasContainer");
-
-      try {
-        const res = await fetch(`https://easybuniness.onrender.com/empresas`);
-        if (!res.ok) throw new Error("Erro ao buscar empresas");
-
-        const empresas = await res.json();
-
-        if (!empresas.length) {
-          container.innerHTML = "<p>Nenhuma empresa cadastrada.</p>";
-          return;
-        }
-
-        empresas.forEach((empresa) => {
-          const card = document.createElement("div");
-          card.classList.add("empresa-card");
-
-          card.innerHTML = `
-            <h3>${empresa.nome}</h3>
-            <p>Status: ${empresa.status}</p>
-            <p>Email: ${empresa.email}</p>
-          `;
-
-          // Salva o email da empresa clicada
-          card.addEventListener("click", () => {
-            localStorage.setItem("empresaVisualizada", empresa.email);
-            window.location.href = "empresa_info.html";
-          });
-
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = "<p>Erro ao carregar as empresas. Tente novamente mais tarde.</p>";
-      }
-    });
-
     // Formulário de cadastro
     document.getElementById("cadastroForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -67,9 +29,11 @@
       const nome = document.getElementById("nome").value.trim();
       const email = document.getElementById("email").value.trim();
       const senha = document.getElementById("senha").value.trim();
+      const mensagemEl = document.getElementById("mensagem");
       
       if (!nome || !email || !senha) {
-        alert("Preencha todos os campos.");
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = "Preencha todos os campos.";
         return;
       }
 
@@ -82,14 +46,19 @@
 
         const data = await res.json();
         if (res.ok) {
-          alert("Cadastro realizado com sucesso!");
-          window.location.href = 'login_pessoa.html';
+          mensagemEl.style.color = 'green';
+          mensagemEl.textContent = "Cadastro realizado com sucesso!";
+          setTimeout(() => {
+            window.location.href = 'login_pessoa.html';
+          }, 1000);
         } else {
-          alert(data.error || 'Erro ao cadastrar.');
+          mensagemEl.style.color = 'red';
+          mensagemEl.textContent = data.error || 'Erro ao cadastrar.';
         }
       } catch (err) {
         console.error(err);
-        alert("Erro de conexão com o servidor.");
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = "Erro de conexão com o servidor.";
       }
     });
   </script>

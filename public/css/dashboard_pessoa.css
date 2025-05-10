@@ -4,16 +4,68 @@ body {
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to right, #8b9add, #11e1dd);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   min-height: 100vh;
 }
 
+/* Topo da página com nome e ícone no canto esquerdo */
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2c3e50;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.user-icon {
+  width: 36px;
+  height: 36px;
+  background-color: #ffffffaa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #2c3e50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.logout-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 h2 {
-  margin: 30px 0 20px;
+  margin: 10px 0;
+  text-align: center;
   color: #2c3e50;
   font-size: 2rem;
+}
+
+#searchInput {
+  padding: 10px;
+  margin: 20px auto;
+  display: block;
+  width: 90%;
+  max-width: 400px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
 #empresasContainer {
@@ -23,6 +75,7 @@ h2 {
   width: 90%;
   max-width: 1200px;
   padding: 20px;
+  margin: auto;
 }
 
 .empresa-card {
@@ -31,6 +84,7 @@ h2 {
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  color: white;
 }
 
 .empresa-card:hover {
@@ -40,12 +94,12 @@ h2 {
 
 .empresa-card h3 {
   margin-top: 0;
-  color: #34495e;
+  color: #f8f8f8;
   font-size: 1.3rem;
 }
 
 .empresa-card p {
-  color: #666;
+  color: #eaeaea;
   margin: 8px 0;
   font-size: 0.95rem;
 }

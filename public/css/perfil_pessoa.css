@@ -1,0 +1,106 @@
+/* perfil_pessoa.css */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #8b9add, #11e1dd);
+  color: #ffffff;
+}
+
+.top-bar {
+  background: linear-gradient(to right, #43cea2, #185a9d);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.user-icon {
+  background: linear-gradient(to right, #8b9add, #11e1dd);
+  padding: 10px;
+  border-radius: 50%;
+  font-size: 18px;
+}
+
+.logout-btn {
+  background-color: #c62828;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #a90300;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 30px;
+  color: #ffffff;
+}
+
+form {
+   background: linear-gradient(to right, #43cea2, #185a9d);
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #000000;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+  border-color: #6abf69;
+  outline: none;
+}
+
+button[type="submit"] {
+  background-color: #388e3c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #105214;
+}
+
+#mensagem {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+}

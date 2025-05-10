@@ -5,42 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Pessoa</title>
   <link rel="stylesheet" href="css/dashboard_pessoa.css" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    .logout-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .empresa-card {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .empresa-card:hover {
-      background-color: #f0f0f0;
-    }
-  </style>
 </head>
 <body>
-  <button class="logout-btn" onclick="logout()">Sair</button>
+  <div class="top-bar">
+    <div class="user-info" id="perfilBtn" style="cursor: pointer;">
+      <div class="user-icon">👤</div>
+      <span id="userName">Usuário</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Sair</button>
+  </div>
+
   <h2>Empresas Cadastradas</h2>
+  <input type="text" id="searchInput" placeholder="Pesquisar empresas por nome..." />
   <div id="empresasContainer"></div>
 
   <script>
@@ -51,19 +27,44 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const container = document.getElementById("empresasContainer");
+      const userNameEl = document.getElementById("userName");
+      const perfilBtn = document.getElementById("perfilBtn");
+      const searchInput = document.getElementById("searchInput");
 
-      try {
-        const res = await fetch(`https://easybuniness.onrender.com/empresas`);
-        if (!res.ok) throw new Error("Erro ao buscar empresas");
+      // Recuperar nome do usuário
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      if (usuario && usuario.nome) {
+        userNameEl.textContent = usuario.nome;
+      }
 
-        const empresas = await res.json();
+      // Redireciona para a tela de perfil
+      perfilBtn.addEventListener("click", () => {
+        window.location.href = "perfil_pessoa.html";
+      });
 
-        if (!empresas.length) {
-          container.innerHTML = "<p>Nenhuma empresa cadastrada.</p>";
+      let empresas = [];
+
+      async function carregarEmpresas() {
+        try {
+          const res = await fetch(`https://easybuniness.onrender.com/empresas`);
+          if (!res.ok) throw new Error("Erro ao buscar empresas");
+
+          empresas = await res.json();
+          mostrarEmpresas(empresas);
+        } catch (err) {
+          console.error("Erro ao buscar empresas:", err);
+          container.innerHTML = "<p style='color:red;'>Erro ao carregar as empresas. Tente novamente mais tarde.</p>";
+        }
+      }
+
+      function mostrarEmpresas(lista) {
+        container.innerHTML = "";
+        if (!lista.length) {
+          container.innerHTML = "<p>Nenhuma empresa encontrada.</p>";
           return;
         }
 
-        empresas.forEach((empresa, index) => {
+        lista.forEach((empresa, index) => {
           const card = document.createElement("div");
           card.classList.add("empresa-card");
 
@@ -80,11 +81,15 @@
 
           container.appendChild(card);
         });
-
-      } catch (err) {
-        console.error("Erro ao buscar empresas:", err);
-        container.innerHTML = "<p style='color:red;'>Erro ao carregar as empresas. Tente novamente mais tarde.</p>";
       }
+
+      searchInput.addEventListener("input", () => {
+        const termo = searchInput.value.toLowerCase();
+        const filtradas = empresas.filter(e => e.nome.toLowerCase().includes(termo));
+        mostrarEmpresas(filtradas);
+      });
+
+      carregarEmpresas();
     });
   </script>
 </body>
