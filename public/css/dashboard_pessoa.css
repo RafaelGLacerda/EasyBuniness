@@ -45,9 +45,12 @@ body {
   color: white;
   border: none;
   padding: 10px 15px;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
+}
+.logout-btn:hover {
+  background: #c9302c;
 }
 
 h2 {
