@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #43cea2, #185a9d);
+  background: linear-gradient(to right, #c8a1a1, #5a3935); /* Gradiente mais quente */
   padding: 30px;
 }
 
@@ -45,10 +45,10 @@ body {
 .empresa-info {
   flex: 1;
   min-width: 60%;
-  background: linear-gradient(to right, #8b9add, #11e1dd);
+  background: linear-gradient(to right, #d99f92, #8a5a4e); /* Gradiente com tons mais terrosos */
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   color: #333;
 }
 
@@ -56,9 +56,32 @@ body {
   margin-bottom: 20px;
   font-size: 2rem;
   font-weight: bold;
-  color: #0069d9;
+  background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  background: linear-gradient(90deg,
+    #ff0000,  /* vermelho */
+    #ff9900,  /* laranja */
+    #ffff00,  /* amarelo */
+    #00ff00,  /* verde puro */
+    #00ffff,  /* ciano */
+    #0000ff,  /* azul */
+    #8b00ff   /* violeta */
+  );
+  background-size: 400% 100%;
+  animation: prismaAnim 4s linear infinite;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
 }
 
+@keyframes prismaAnim {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
 .empresa-info p {
   margin: 10px 0;
   font-size: 1.1rem;
@@ -66,7 +89,7 @@ body {
   color: #444;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* Adicionando sombra */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .empresa-info p strong {
@@ -77,10 +100,10 @@ body {
 /* Alteração de status */
 .add-produto-container {
   min-width: 35%;
-  background: linear-gradient(to right, #8b9add, #11e1dd);
+  background: linear-gradient(to right, #d99f92, #8a5a4e); /* Mantendo os tons terrosos */
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,7 +136,7 @@ body {
   background: white;
   padding: 16px;
   border-radius: 12px;
-  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 

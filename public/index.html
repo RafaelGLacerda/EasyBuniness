@@ -3,23 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>EasyBusiness - Início</title>
-  <!-- Ajuste no caminho do CSS -->
   <link rel="stylesheet" href="css/index.css" />
 </head>
 <body>
-  <h1>Bem-vindo ao EasyBusiness</h1>
-  <p>Você é uma:</p>
-  <button id="btnPessoa">Pessoa</button>
-  <button id="btnEmpresa">Empresa</button>
+  <section class="hero">
+    <h1>Quer visitar empresas?</h1>
+    <p>Seja um Usuário</p>
+    <button onclick="window.location.href='login_pessoa.html'">ENTRAR</button>
+  </section>
 
-  <script>
-    document.getElementById("btnPessoa").addEventListener("click", () => {
-      window.location.href = "login_pessoa.html"; // Garantir que login_pessoa.html esteja na pasta public
-    });
-
-    document.getElementById("btnEmpresa").addEventListener("click", () => {
-      window.location.href = "login_empresa.html"; // Garantir que login_empresa.html esteja na pasta public
-    });
-  </script>
+  <section class="hero">
+    <h1>Quer ser uma Empresa Parceira?</h1>
+    <p>Entre por aqui!</p>
+    <button onclick="window.location.href='login_empresa.html'">LOGIN EMPRESA</button>
+  </section>
 </body>
 </html>

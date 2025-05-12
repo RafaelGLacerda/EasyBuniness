@@ -1,19 +1,32 @@
 /* login.css */
-body {
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #667eea, #764ba2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  color: #fff;
+  padding: 0;
 }
 
-h1, h2 {
-  margin-bottom: 20px;
-  font-weight: 500;
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #c48d84, #5a3935);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+main {
+  text-align: center;
+  width: 100%;
+  max-width: 450px;
+}
+
+h2 {
+  margin-bottom: 25px;
+  font-weight: 600;
+  
 }
 
 form {
@@ -22,11 +35,16 @@ form {
   border-radius: 12px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+label {
+  text-align: left;
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+  color: #f0f0f0;
 }
 
 input {
@@ -35,6 +53,8 @@ input {
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
+  background-color: #fff;
+  color: #333;
 }
 
 button {
@@ -46,10 +66,18 @@ button {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
+  font-size: 1rem;
 }
 
 button:hover {
   background-color: #e0e0e0;
+}
+
+#mensagem {
+  margin-top: 15px;
+  color: #ffdddd;
+  font-weight: bold;
+  font-size: 0.95rem;
 }
 
 p {
@@ -60,13 +88,26 @@ p {
 a {
   color: #ffd700;
   text-decoration: none;
+  font-weight: 500;
 }
 
 a:hover {
   text-decoration: underline;
 }
 
-#mensagem {
-  color: #ffdddd;
-  font-size: 0.9rem;
+/* Botão "Voltar" fora do form */
+.voltar-btn {
+  margin-top: 10px;
+  background-color: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.voltar-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }

@@ -3,17 +3,17 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to right, #8b9add, #11e1dd);
+  background: linear-gradient(to right, #d99f92, #8a5a4e); /* Gradiente com tons quentes e terrosos */
   color: #ffffff;
 }
 
 .top-bar {
-  background: linear-gradient(to right, #43cea2, #185a9d);
+  background: linear-gradient(to right, #c48d84, #a46f6b); /* Gradiente mais quente para a barra superior */
   padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #4e3b35; /* Cor mais escura para a borda inferior */
 }
 
 .user-info {
@@ -25,14 +25,14 @@ body {
 }
 
 .user-icon {
-  background: linear-gradient(to right, #8b9add, #11e1dd);
+  background-color: #fff0e1; /* Usando gradiente suave com tons terrosos */
   padding: 10px;
   border-radius: 50%;
   font-size: 18px;
 }
 
 .logout-btn {
-  background-color: #c62828;
+  background-color: #e74c3c; /* Cor mais suave de vermelho */
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -43,7 +43,7 @@ body {
 }
 
 .logout-btn:hover {
-  background-color: #a90300;
+  background-color: #a90300; /* Vermelho mais intenso no hover */
 }
 
 h2 {
@@ -53,7 +53,7 @@ h2 {
 }
 
 form {
-   background: linear-gradient(to right, #43cea2, #185a9d);
+   background: linear-gradient(to right, #c48d84, #a46f6b); /* Gradiente com tons mais destacados de terra */
   max-width: 400px;
   margin: 30px auto;
   padding: 25px;

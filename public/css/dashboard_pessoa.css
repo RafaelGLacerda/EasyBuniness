@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #8b9add, #11e1dd);
+  background: linear-gradient(to right, #d99f92, #8a5a4e); /* Gradiente com tons terrosos mais quentes */
   min-height: 100vh;
 }
 
@@ -21,7 +21,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #2c3e50;
+  color: #3e2f2b; /* Cor mais suave para o texto */
   font-weight: bold;
   font-size: 16px;
 }
@@ -29,19 +29,19 @@ body {
 .user-icon {
   width: 36px;
   height: 36px;
-  background-color: #ffffffaa;
+  background-color: #fff0e1; /* Fundo mais suave, com tons mais claros */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
   font-weight: bold;
-  color: #2c3e50;
+  color: #3e2f2b;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .logout-btn {
-  background-color: #e74c3c;
+  background-color: #d9534f; /* Cor mais suave de vermelho */
   color: white;
   border: none;
   padding: 10px 15px;
@@ -53,7 +53,7 @@ body {
 h2 {
   margin: 10px 0;
   text-align: center;
-  color: #2c3e50;
+  color: #3e2f2b;
   font-size: 2rem;
 }
 
@@ -64,7 +64,7 @@ h2 {
   width: 90%;
   max-width: 400px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #b57f6d; /* Cor mais suave para a borda */
   border-radius: 6px;
 }
 
@@ -79,17 +79,18 @@ h2 {
 }
 
 .empresa-card {
-  background: linear-gradient(to right, #43cea2, #185a9d);
+  background: linear-gradient(to right, #c48d84, #a46f6b); /* Gradiente mais destacado */
   padding: 20px;
   border-radius: 12px;
+  border: 1px solid #a46f6b; /* Borda de 1px com a cor mais escura do gradiente */
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
   color: white;
 }
 
 .empresa-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05); /* Aumenta um pouco mais o efeito de hover */
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
 }
 
 .empresa-card h3 {
@@ -103,3 +104,4 @@ h2 {
   margin: 8px 0;
   font-size: 0.95rem;
 }
+

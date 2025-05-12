@@ -3,7 +3,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #43cea2, #185a9d);
+  background: linear-gradient(to top left, #d9a89b 40%, #a46f6b 70%, #6b3d3a);
+
+
   display: flex;
   flex-direction: column;
   align-items: center;
