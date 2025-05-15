@@ -73,14 +73,16 @@
         const card = document.createElement('div');
         card.className = 'produto-card';
         card.innerHTML = `
-          <div class="produto-img-container">
-            <img src="${produto.imagem}" alt="${produto.nome}" class="produto-img" />
-          </div>
-          <h3>${produto.nome}</h3>
-          <p>Descrição: ${produto.descricao}</p>
-          <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
-          <button onclick="editarProduto(${index})">Editar</button>
-        `;
+  <div class="produto-img-container">
+    <img src="${produto.imagem}" alt="${produto.nome}" class="produto-img" />
+  </div>
+  <h3>${produto.nome}</h3>
+  <p>Descrição: ${produto.descricao}</p>
+  <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
+  <p>Estoque: ${produto.quantidade ?? 0}</p>
+  <button onclick="editarProduto(${index})">Editar</button>
+`;
+
         listaProdutos.appendChild(card);
       });
     });

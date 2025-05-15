@@ -75,7 +75,7 @@ app.post('/api/status', (req, res) => {
 });
 
 app.post('/api/adicionar-produto', (req, res) => {
-  const { email, nome, descricao, preco, imagem } = req.body;
+  const { email, nome, descricao, preco, imagem, quantidade } = req.body;
   const data = lerUsuarios();
 
   const empresa = data.empresas.find(e => e.email === email);
@@ -83,13 +83,13 @@ app.post('/api/adicionar-produto', (req, res) => {
     return res.status(404).json({ error: 'Empresa não encontrada.' });
   }
 
-  empresa.produtos.push({ nome, descricao, preco: parseFloat(preco), imagem });
+  empresa.produtos.push({ nome, descricao, preco: parseFloat(preco), imagem, quantidade: parseInt(quantidade) });
   salvarUsuarios(data);
   res.json({ mensagem: 'Produto adicionado com sucesso.' });
 });
 
 app.post('/api/editar-produto', (req, res) => {
-  const { email, index, nome, descricao, preco, imagem } = req.body;
+ const { email, index, nome, descricao, preco, imagem, quantidade } = req.body;
   const data = lerUsuarios();
 
   const empresa = data.empresas.find(e => e.email === email);
@@ -97,12 +97,15 @@ app.post('/api/editar-produto', (req, res) => {
     return res.status(404).json({ error: 'Produto ou empresa não encontrada.' });
   }
 
-  empresa.produtos[index] = {
-    nome,
-    descricao,
-    preco: parseFloat(preco),
-    imagem
-  };
+
+empresa.produtos[index] = {
+  nome,
+  descricao,
+  preco: parseFloat(preco),
+  imagem,
+  quantidade: parseInt(quantidade)
+};
+
 
   salvarUsuarios(data);
   res.json({ mensagem: 'Produto editado com sucesso.' });
