@@ -1,12 +1,16 @@
 {
   "pessoas": [
     {
-      "nome": "RAFAEL PEREIRA GRIGORIO DE LACERDA",
-      "email": "rafaellacerda2004@gmail.com",
-      "senha": "rafael12",
-      "telefone": "231321321",
-      "contato": "instagram"
-    }
+      
+  "nome": "RAFAEL PEREIRA GRIGORIO DE LACERDA",
+  "email": "rafaellacerda2004@gmail.com",
+  "senha": "rafael12",
+  "telefone": "231321321",
+  "contato": "instagram",
+  "cpf": "123.456.789-00",
+  "endereco": "Rua Exemplo, 123"
+}
+
   ],
   "empresas": [
     {

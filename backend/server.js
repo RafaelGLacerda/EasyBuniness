@@ -189,17 +189,13 @@ app.post('/login-usuario', (req, res) => {
 
 app.post('/api/atualizarPessoa', (req, res) => {
   try {
-    const { email, nome, telefone, contato } = req.body;
+    const { email, nome, telefone, contato, cpf, endereco } = req.body;
 
     if (!email) {
       return res.status(400).json({ error: 'Email é obrigatório.' });
     }
 
     const dados = lerUsuarios();
-
-    if (!dados || !Array.isArray(dados.pessoas)) {
-      return res.status(500).json({ error: 'Arquivo de usuários corrompido ou inválido.' });
-    }
 
     const index = dados.pessoas.findIndex(p => p.email === email);
     if (index === -1) {
@@ -211,19 +207,21 @@ app.post('/api/atualizarPessoa', (req, res) => {
       ...pessoaAntiga,
       nome: nome ?? pessoaAntiga.nome,
       telefone: telefone ?? pessoaAntiga.telefone,
-      contato: contato ?? pessoaAntiga.contato
+      contato: contato ?? pessoaAntiga.contato,
+      cpf: cpf ?? pessoaAntiga.cpf,
+      endereco: endereco ?? pessoaAntiga.endereco
     };
 
     dados.pessoas[index] = pessoaAtualizada;
 
     salvarUsuarios(dados);
-    console.log(`Pessoa atualizada: ${email}`);
     return res.status(200).json({ mensagem: 'Pessoa atualizada com sucesso.' });
   } catch (erro) {
     console.error('Erro ao atualizar pessoa:', erro);
     return res.status(500).json({ error: 'Erro interno do servidor ao atualizar os dados.' });
   }
 });
+
 
 // 🌐 Rotas públicas
 app.get('/empresas', (req, res) => {
