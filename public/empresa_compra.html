@@ -120,36 +120,38 @@
       }
     }
 
-    async function responderPedido(index, status) {
-      const pedidos = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`).then(res => res.json());
-      const pedido = pedidos.compras[index];
-      const obs = document.getElementById(`obs-${index}`).value;
+async function responderPedido(index, status) {
+  const pedidosRes = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`);
+  const pedidosJson = await pedidosRes.json();
+  const pedido = pedidosJson.comprasRecebidas[index]; // CORRIGIDO
+  const obs = document.getElementById(`obs-${index}`).value;
 
-      try {
-        const res = await fetch('https://easybuniness.onrender.com/api/compras/resposta', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            emailEmpresa: empresa.email,
-            indexPedido: index,
-            status,
-            observacao: obs
-          })
-        });
+  try {
+    const res = await fetch('https://easybuniness.onrender.com/api/compras/resposta', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emailEmpresa: empresa.email,
+        indexPedido: index,
+        status,
+        observacao: obs
+      })
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (res.ok) {
-          alert("Pedido respondido com sucesso!");
-          carregarPedidos();
-        } else {
-          alert(data.error || "Erro ao enviar resposta.");
-        }
-      } catch (err) {
-        console.error("Erro:", err);
-        alert("Erro de conexão.");
-      }
+    if (res.ok) {
+      alert("Pedido respondido com sucesso!");
+      carregarPedidos();
+    } else {
+      alert(data.error || "Erro ao enviar resposta.");
     }
+  } catch (err) {
+    console.error("Erro:", err);
+    alert("Erro de conexão.");
+  }
+}
+
 
     carregarPedidos();
   </script>
