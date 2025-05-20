@@ -260,10 +260,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-// 🚀 Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando na porta ${PORT}`);
-});
+
 // 📌 Rota 1 - Adicionar item ao carrinho
 app.post('/api/carrinho/adicionar', (req, res) => {
   const { emailUsuario, empresaEmail, produtoIndex, quantidade } = req.body;
@@ -458,4 +455,19 @@ app.post('/api/carrinho/remover', (req, res) => {
   usuario.carrinho.splice(produtoIndex, 1);
   salvarUsuarios(data);
   res.json({ mensagem: 'Item removido do carrinho.' });
+});
+
+// 📌 Rota 6 - Ver compras da pessoa
+app.get('/api/compras/pessoa/:email', (req, res) => {
+  const data = lerUsuarios();
+  const pessoa = data.pessoas.find(p => p.email === req.params.email);
+  if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada.' });
+
+  res.json({ compras: pessoa.compras || [] });
+});
+
+
+// 🚀 Iniciar servidor
+app.listen(PORT, () => {
+  console.log(`✅ Servidor rodando na porta ${PORT}`);
 });

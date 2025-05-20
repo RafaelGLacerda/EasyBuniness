@@ -49,16 +49,22 @@
 
     const listaCompras = document.getElementById("listaCompras");
 
-    async function carregarCompras() {
-      try {
-        const res = await fetch(`https://easybuniness.onrender.com/api/compras/pessoa/${usuario.email}`);
-        const json = await res.json();
-        const compras = json.compras || [];
+   async function carregarCompras() {
+  try {
+    const res = await fetch(`https://easybuniness.onrender.com/api/compras/pessoa/${usuario.email}`);
 
-        if (compras.length === 0) {
-          listaCompras.innerHTML = "<p>Você ainda não realizou nenhuma compra.</p>";
-          return;
-        }
+    if (!res.ok) {
+      const erroTexto = await res.text();
+      throw new Error("Erro ao buscar compras: " + erroTexto);
+    }
+
+    const json = await res.json();
+    const compras = json.compras || [];
+
+    if (compras.length === 0) {
+      listaCompras.innerHTML = "<p>Você ainda não realizou nenhuma compra.</p>";
+      return;
+    }
 
         const empresasRes = await fetch('https://easybuniness.onrender.com/api/empresas');
         const empresas = await empresasRes.json();
@@ -93,10 +99,10 @@
         listaCompras.innerHTML = html;
 
       } catch (err) {
-        console.error("Erro ao carregar compras:", err);
-        listaCompras.innerHTML = "<p style='color: red;'>Erro ao carregar as compras.</p>";
-      }
-    }
+    console.error("Erro ao carregar compras:", err);
+    listaCompras.innerHTML = `<p style='color: red;'>Erro ao carregar as compras: ${err.message}</p>`;
+  }
+}
 
     carregarCompras();
   </script>
