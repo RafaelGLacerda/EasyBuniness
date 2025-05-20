@@ -31,3 +31,46 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+  .item-carrinho {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+      background-color: #f8f8f8;
+    }
+
+    button {
+      padding: 4px 8px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .btn-remover {
+      background-color: red;
+      color: white;
+    }
+
+    .btn-quantidade {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-finalizar {
+      background-color: #28a745;
+      color: white;
+      padding: 8px 16px;
+      margin-top: 15px;
+    }
+
+    .voltar-btn {
+      background-color: #6c757d;
+      color: white;
+      padding: 8px 16px;
+      margin-top: 10px;
+    }

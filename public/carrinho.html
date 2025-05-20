@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Meu Carrinho</title>
   <link rel="stylesheet" href="css/carrinho.css" />
+
 </head>
 <body>
   <div class="container">
@@ -12,11 +13,8 @@
     <div id="listaCarrinho"></div>
     <p id="totalCarrinho">Total: R$ 0,00</p>
 
-    <button id="btnFinalizar onclick="window.location.href='compra_pessoa.html'">Finalizar Compra</button>
-    <button onclick="window.location.href='dashboard_pessoa.html'">Voltar</button>
-    <button class="logout-btn" style="background-color: #ffc107;" onclick="window.location.href='compra_pessoa.html'">Finalizar</button>
-
-
+    <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
+    <button class="voltar-btn" onclick="window.location.href='dashboard_pessoa.html'">Voltar</button>
 
     <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
   </div>
@@ -31,7 +29,6 @@
     const listaCarrinho = document.getElementById("listaCarrinho");
     const totalCarrinho = document.getElementById("totalCarrinho");
     const mensagem = document.getElementById("mensagem");
-    const btnFinalizar = document.getElementById("btnFinalizar");
 
     let dadosCarrinho = [];
 
@@ -53,11 +50,11 @@
         let html = "";
         let total = 0;
 
-        for (const item of dadosCarrinho) {
+        dadosCarrinho.forEach((item, index) => {
           const empresa = empresas.find(e => e.email === item.empresaEmail);
-          if (!empresa) continue;
+          if (!empresa) return;
           const produto = empresa.produtos[item.produtoIndex];
-          if (!produto) continue;
+          if (!produto) return;
 
           const subtotal = produto.preco * item.quantidade;
           total += subtotal;
@@ -67,23 +64,69 @@
               <h3>${produto.nome}</h3>
               <p><strong>Empresa:</strong> ${empresa.nome}</p>
               <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
-              <p><strong>Quantidade:</strong> ${item.quantidade}</p>
+              <p><strong>Quantidade:</strong>
+                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, -1)">-</button>
+                <span id="qtd-${index}">${item.quantidade}</span>
+                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, 1)">+</button>
+              </p>
               <p><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</p>
+              <button class="btn-remover" onclick="removerItem('${usuario.email}', ${index})">Remover</button>
               <hr>
             </div>
           `;
-        }
+        });
 
         listaCarrinho.innerHTML = html;
         totalCarrinho.textContent = "Total: R$ " + total.toFixed(2);
-
       } catch (err) {
         console.error("Erro ao carregar carrinho:", err);
         listaCarrinho.innerHTML = "<p style='color: red;'>Erro ao carregar o carrinho.</p>";
       }
     }
 
-    btnFinalizar.addEventListener("click", async () => {
+    async function alterarQuantidade(email, produtoIndex, delta) {
+      try {
+        const res = await fetch('/api/carrinho/atualizar-quantidade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailUsuario: email, produtoIndex, delta })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          carregarCarrinho();
+        } else {
+          alert(data.error || "Erro ao alterar quantidade.");
+        }
+      } catch (err) {
+        console.error("Erro:", err);
+        alert("Erro de conexão.");
+      }
+    }
+
+    async function removerItem(email, produtoIndex) {
+      if (!confirm("Deseja remover este item do carrinho?")) return;
+
+      try {
+        const res = await fetch('/api/carrinho/remover', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailUsuario: email, produtoIndex })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          carregarCarrinho();
+        } else {
+          alert(data.error || "Erro ao remover item.");
+        }
+      } catch (err) {
+        console.error("Erro:", err);
+        alert("Erro de conexão.");
+      }
+    }
+
+    async function finalizarCompra() {
       try {
         const res = await fetch('/api/compras/finalizar', {
           method: 'POST',
@@ -95,8 +138,8 @@
 
         if (res.ok) {
           mensagem.style.color = "green";
-          mensagem.textContent = data.mensagem || "Compra finalizada!";
-          await carregarCarrinho();
+          mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
+          await carregarCarrinho(); // recarrega o carrinho após finalizar
         } else {
           mensagem.style.color = "red";
           mensagem.textContent = data.error || "Erro ao finalizar a compra.";
@@ -106,7 +149,7 @@
         mensagem.style.color = "red";
         mensagem.textContent = "Erro de conexão.";
       }
-    });
+    }
 
     carregarCarrinho();
   </script>

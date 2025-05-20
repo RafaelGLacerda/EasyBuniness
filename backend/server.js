@@ -290,53 +290,86 @@ app.get('/api/carrinho/:email', (req, res) => {
   res.json({ carrinho: usuario.carrinho || [] });
 });
 
-// 📌 Rota 3 - Finalizar compra (move carrinho → compras)
+
 app.post('/api/compras/finalizar', (req, res) => {
   const { emailUsuario } = req.body;
-  const data = lerUsuarios();
+  const dados = lerUsuarios();
 
-  const usuario = data.pessoas.find(p => p.email === emailUsuario);
-  if (!usuario || !usuario.carrinho || usuario.carrinho.length === 0) {
-    return res.status(400).json({ error: 'Carrinho vazio ou usuário inválido.' });
-  }
+  const usuario = dados.pessoas.find(p => p.email === emailUsuario);
+  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado.' });
 
-  const agora = new Date().toISOString();
+  const carrinho = usuario.carrinho || [];
+  if (carrinho.length === 0) return res.status(400).json({ error: 'Carrinho está vazio.' });
 
-  usuario.carrinho.forEach(item => {
-    const empresa = data.empresas.find(e => e.email === item.empresaEmail);
-    if (!empresa || !empresa.produtos[item.produtoIndex]) return;
+  const produtosPorEmpresa = {};
+
+  for (let item of carrinho) {
+    const empresa = dados.empresas.find(e => e.email === item.empresaEmail);
+    if (!empresa) return res.status(404).json({ error: 'Empresa não encontrada.' });
 
     const produto = empresa.produtos[item.produtoIndex];
-    const produtoPedido = {
-      ...produto,
+    if (!produto) return res.status(404).json({ error: 'Produto não encontrado.' });
+
+    if (produto.quantidade < item.quantidade) {
+      return res.status(400).json({ error: `Estoque insuficiente para ${produto.nome}` });
+    }
+
+    // Agrupar por empresa
+    if (!produtosPorEmpresa[item.empresaEmail]) {
+      produtosPorEmpresa[item.empresaEmail] = [];
+    }
+
+    produtosPorEmpresa[item.empresaEmail].push({
+      nome: produto.nome,
+      preco: produto.preco,
       quantidade: item.quantidade
+    });
+
+    // Atualizar estoque
+    produto.quantidade -= item.quantidade;
+  }
+
+  // Criar compras em pessoa e empresa
+  const dataAtual = new Date().toISOString();
+
+  for (let empresaEmail in produtosPorEmpresa) {
+    const produtos = produtosPorEmpresa[empresaEmail];
+
+    const compraPessoa = {
+      empresaEmail,
+      produtos,
+      status: "Pendente",
+      observacao: "",
+      data: dataAtual
     };
 
-    // Adiciona à compra do usuário
-    if (!usuario.compras) usuario.compras = [];
-    usuario.compras.push({
-      empresaEmail: item.empresaEmail,
-      produtos: [produtoPedido],
+    const empresa = dados.empresas.find(e => e.email === empresaEmail);
+    const compraEmpresa = {
+      usuario: {
+        nome: usuario.nome,
+        email: usuario.email,
+        endereco: usuario.endereco,
+        contato: usuario.contato
+      },
+      produtos,
       status: "Pendente",
       observacao: "",
-      data: agora
-    });
+      data: dataAtual
+    };
 
-    // Adiciona à compra da empresa
-    if (!empresa.comprasRecebidas) empresa.comprasRecebidas = [];
-    empresa.comprasRecebidas.push({
-      usuarioEmail: emailUsuario,
-      produtos: [produtoPedido],
-      status: "Pendente",
-      observacao: "",
-      data: agora
-    });
-  });
+    usuario.compras.push(compraPessoa);
+    empresa.comprasRecebidas.push(compraEmpresa);
+  }
 
-  usuario.carrinho = []; // esvazia o carrinho
-  salvarUsuarios(data);
-  res.json({ mensagem: 'Compra finalizada com sucesso.' });
+  // Limpar carrinho do usuário
+  usuario.carrinho = [];
+
+  salvarUsuarios(dados);
+  res.json({ mensagem: "Compra finalizada e enviada para as empresas." });
 });
+
+
+
 
 // 📌 Rota 4 - Ver compras recebidas por empresa
 app.get('/api/compras/empresa/:email', (req, res) => {
@@ -349,37 +382,33 @@ app.get('/api/compras/empresa/:email', (req, res) => {
 
 // 📌 Rota 5 - Empresa responde (aceitar ou indeferir compra)
 app.post('/api/compras/resposta', (req, res) => {
-  const { empresaEmail, usuarioEmail, dataCompra, status, observacao } = req.body;
-  const data = lerUsuarios();
+  const { emailEmpresa, indexPedido, status, observacao } = req.body;
+  const dados = lerUsuarios();
 
-  const empresa = data.empresas.find(e => e.email === empresaEmail);
-  const usuario = data.pessoas.find(p => p.email === usuarioEmail);
-
-  if (!empresa || !usuario) return res.status(404).json({ error: 'Empresa ou usuário não encontrados.' });
-
-  // Atualiza compra na empresa
-  const compraEmpresa = empresa.comprasRecebidas.find(c => c.usuarioEmail === usuarioEmail && c.data === dataCompra);
-  if (compraEmpresa) {
-    compraEmpresa.status = status;
-    compraEmpresa.observacao = observacao;
+  const empresa = dados.empresas.find(e => e.email === emailEmpresa);
+  if (!empresa || !empresa.comprasRecebidas[indexPedido]) {
+    return res.status(404).json({ error: 'Pedido não encontrado para esta empresa.' });
   }
 
-  // Atualiza compra no usuário
-  const compraUsuario = usuario.compras.find(c => c.empresaEmail === empresaEmail && c.data === dataCompra);
-  if (compraUsuario) {
-    compraUsuario.status = status;
-    compraUsuario.observacao = observacao;
+  const pedido = empresa.comprasRecebidas[indexPedido];
+  pedido.status = status;
+  pedido.observacao = observacao;
+
+  // Encontrar o usuário e atualizar o pedido correspondente
+  const pessoa = dados.pessoas.find(p => p.email === pedido.usuario.email);
+  if (pessoa) {
+    const pedidoPessoa = pessoa.compras.find(
+      c => c.empresaEmail === emailEmpresa &&
+           c.data === pedido.data &&
+           JSON.stringify(c.produtos) === JSON.stringify(pedido.produtos)
+    );
+
+    if (pedidoPessoa) {
+      pedidoPessoa.status = status;
+      pedidoPessoa.observacao = observacao;
+    }
   }
 
-  salvarUsuarios(data);
-  res.json({ mensagem: `Compra ${status.toLowerCase()} com sucesso.` });
-});
-
-// 📌 Rota 6 - Ver compras feitas por usuário
-app.get('/api/compras/pessoa/:email', (req, res) => {
-  const data = lerUsuarios();
-  const usuario = data.pessoas.find(p => p.email === req.params.email);
-  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado.' });
-
-  res.json({ compras: usuario.compras || [] });
+  salvarUsuarios(dados);
+  res.json({ mensagem: "Pedido atualizado com sucesso." });
 });

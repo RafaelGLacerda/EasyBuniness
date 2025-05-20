@@ -10,6 +10,7 @@
       opacity: 0.8;
       pointer-events: none;
     }
+
     .produto-card {
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -17,27 +18,48 @@
       margin: 10px 0;
       background-color: #f9f9f9;
     }
+
     .empresa-info p {
       margin: 10px 0;
       padding: 10px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);  /* Adicionando sombra */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="number"] {
+      padding: 5px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 6px 10px;
+      margin-top: 5px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
   <div class="dashboard-container">
     <a href="dashboard_pessoa.html" class="logout-btn">Voltar</a>
-<button class="logout-btn" style="background-color: #ffc107;" onclick="window.location.href='carrinho.html'">Ir para o Carrinho</button>
+    <button class="logout-btn" style="background-color: #ffc107;" onclick="window.location.href='carrinho.html'">Ir para o Carrinho</button>
+
     <div class="top-section">
       <div class="empresa-info">
         <h2 id="nomeEmpresa">Nome da Empresa</h2>
         <p id="emailEmpresa">Email:</p>
         <p id="statusEmpresa">Status:</p>
-        <p id="telefoneEmpresa">Telefone:</p> <!-- Novo campo -->
-        <p id="enderecoEmpresa">Endereço:</p> <!-- Novo campo -->
-        <p id="contatoEmpresa">Contato:</p> <!-- Novo campo -->
-        <p id="descricaoEmpresa">Descrição:</p> <!-- Novo campo -->
+        <p id="telefoneEmpresa">Telefone:</p>
+        <p id="enderecoEmpresa">Endereço:</p>
+        <p id="contatoEmpresa">Contato:</p>
+        <p id="descricaoEmpresa">Descrição:</p>
       </div>
     </div>
 
@@ -47,47 +69,102 @@
   </div>
 
   <script>
+    async function adicionarAoCarrinho(empresaEmail, produtoIndex, maxQuantidade) {
+      const usuario = JSON.parse(localStorage.getItem('usuario'));
+      if (!usuario) {
+        alert("Você precisa estar logado.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const input = document.getElementById(`quantidade-${produtoIndex}`);
+      let quantidade = parseInt(input.value);
+
+      if (isNaN(quantidade) || quantidade < 1) {
+        alert("Quantidade inválida.");
+        return;
+      }
+
+      if (quantidade > maxQuantidade) {
+        alert("Quantidade excede o estoque disponível.");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/carrinho/adicionar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            emailUsuario: usuario.email,
+            empresaEmail,
+            produtoIndex,
+            quantidade
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert("Produto adicionado ao carrinho!");
+        } else {
+          alert(data.error || "Erro ao adicionar ao carrinho.");
+        }
+      } catch (err) {
+        console.error("Erro ao adicionar ao carrinho:", err);
+        alert("Erro de conexão.");
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const empresaId = localStorage.getItem('empresaVisualizada');
-  
+
       if (!empresaId) {
         alert('Nenhuma empresa selecionada.');
         window.location.href = 'dashboard_pessoa.html';
         return;
       }
-  
+
       try {
         const res = await fetch(`https://easybuniness.onrender.com/empresas/${empresaId}`);
         if (!res.ok) throw new Error('Erro ao buscar empresa');
-  
+
         const empresa = await res.json();
-  
-        // Preenche os detalhes da empresa
+
         document.getElementById('nomeEmpresa').textContent = empresa.nome || "Sem nome";
         document.getElementById('emailEmpresa').textContent = "Email: " + (empresa.email || "Sem email");
         document.getElementById('statusEmpresa').textContent = "Status: " + (empresa.status || "Indefinido");
-        document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresa.telefone || "Sem telefone"); // Novo campo
-        document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresa.endereco || "Sem endereço"); // Novo campo
-        document.getElementById('contatoEmpresa').textContent = "Contato: " + (empresa.contato || "Sem contato"); // Novo campo
-        document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresa.descricao || "Sem descrição"); // Novo campo
-  
+        document.getElementById('telefoneEmpresa').textContent = "Telefone: " + (empresa.telefone || "Sem telefone");
+        document.getElementById('enderecoEmpresa').textContent = "Endereço: " + (empresa.endereco || "Sem endereço");
+        document.getElementById('contatoEmpresa').textContent = "Contato: " + (empresa.contato || "Sem contato");
+        document.getElementById('descricaoEmpresa').textContent = "Descrição: " + (empresa.descricao || "Sem descrição");
+
         const produtos = empresa.produtos || [];
         document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
-  
+
         const listaProdutos = document.getElementById('listaProdutos');
-  
-        produtos.forEach(produto => {
+
+        produtos.forEach((produto, i) => {
           const card = document.createElement('div');
           card.className = 'produto-card';
+
           card.innerHTML = ` 
             <h3>${produto.nome}</h3>
             <p>Descrição: ${produto.descricao}</p>
             <p>Preço: R$ ${parseFloat(produto.preco).toFixed(2)}</p>
+            <p>Estoque: ${produto.quantidade}</p>
             <img src="${produto.imagem}" alt="Imagem do produto" style="width: 100%; height: auto; border-radius: 8px;">
+
+            <label for="quantidade-${i}">Quantidade:</label>
+            <input type="number" id="quantidade-${i}" min="1" max="${produto.quantidade}" value="1" style="width: 60px;">
+
+            <button onclick="adicionarAoCarrinho('${empresa.email}', ${i}, ${produto.quantidade})">
+              Adicionar ao Carrinho
+            </button>
           `;
+
           listaProdutos.appendChild(card);
         });
-  
+
       } catch (error) {
         console.error(error);
         alert('Erro ao carregar informações da empresa.');

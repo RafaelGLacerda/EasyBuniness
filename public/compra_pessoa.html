@@ -3,14 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Minhas Compras</title>
+  <title>Finalizar Compra</title>
   <link rel="stylesheet" href="css/compras_pessoa.css" />
+  <style>
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .user-info, .resumo-produtos {
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .produto {
+      margin-bottom: 10px;
+    }
+
+    .botao-finalizar {
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .botao-voltar {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #6c757d;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Minhas Compras</h1>
-    <div id="listaCompras"></div>
-    <button onclick="window.location.href='carrinho.html'">Voltar</button>
+    <h1>Finalizar Compra</h1>
+
+    <div class="user-info" id="dadosUsuario">
+      <!-- Dados do usuário aparecem aqui -->
+    </div>
+
+    <div class="resumo-produtos" id="resumoProdutos">
+      <!-- Produtos do carrinho aparecem aqui -->
+    </div>
+
+    <button class="botao-finalizar" onclick="finalizarCompra()">Enviar Pedido</button>
+    <button class="botao-voltar" onclick="window.location.href='carrinho.html'">Voltar ao Carrinho</button>
+
+    <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
   </div>
 
   <script>
@@ -20,53 +71,88 @@
       window.location.href = "index.html";
     }
 
-    const listaCompras = document.getElementById("listaCompras");
+    const dadosUsuario = document.getElementById("dadosUsuario");
+    const resumoProdutos = document.getElementById("resumoProdutos");
+    const mensagem = document.getElementById("mensagem");
 
-    async function carregarCompras() {
+    let produtosCarrinho = [];
+
+    async function carregarResumoCompra() {
+      dadosUsuario.innerHTML = `
+        <h3>Seus Dados</h3>
+        <p><strong>Nome:</strong> ${usuario.nome}</p>
+        <p><strong>Email:</strong> ${usuario.email}</p>
+        <p><strong>Endereço:</strong> ${usuario.endereco}</p>
+        <p><strong>Contato:</strong> ${usuario.contato}</p>
+      `;
+
       try {
-        const res = await fetch(`/api/compras/pessoa/${usuario.email}`);
+        const res = await fetch(`/api/carrinho/${usuario.email}`);
         const json = await res.json();
-        const compras = json.compras || [];
+        produtosCarrinho = json.carrinho || [];
 
-        if (compras.length === 0) {
-          listaCompras.innerHTML = "<p>Você ainda não realizou nenhuma compra.</p>";
+        if (produtosCarrinho.length === 0) {
+          resumoProdutos.innerHTML = "<p>Seu carrinho está vazio.</p>";
           return;
         }
 
-        let html = "";
+        const empresasRes = await fetch(`/api/empresas`);
+        const empresas = await empresasRes.json();
 
-        for (const compra of compras) {
-          const produtosHTML = compra.produtos.map(p => `
-            <div class="produto">
-              <p><strong>${p.nome}</strong> — R$ ${p.preco.toFixed(2)} x ${p.quantidade}</p>
-            </div>
-          `).join("");
+        let html = "<h3>Resumo dos Produtos</h3>";
+        let total = 0;
 
-          const dataFormatada = new Date(compra.data).toLocaleString("pt-BR");
+        produtosCarrinho.forEach(item => {
+          const empresa = empresas.find(e => e.email === item.empresaEmail);
+          const produto = empresa?.produtos[item.produtoIndex];
 
-          html += `
-            <div class="compra-card">
-              <h3>Empresa: ${compra.empresaEmail}</h3>
-              <p><strong>Status:</strong> ${compra.status}</p>
-              <p><strong>Data:</strong> ${dataFormatada}</p>
-              <div class="produtos">
-                ${produtosHTML}
+          if (produto) {
+            const subtotal = produto.preco * item.quantidade;
+            total += subtotal;
+
+            html += `
+              <div class="produto">
+                <p><strong>${produto.nome}</strong> — R$ ${produto.preco.toFixed(2)} x ${item.quantidade}</p>
               </div>
-              <p><strong>Observação:</strong> ${compra.observacao || 'Nenhuma'}</p>
-              <hr>
-            </div>
-          `;
-        }
+            `;
+          }
+        });
 
-        listaCompras.innerHTML = html;
+        html += `<p><strong>Total: R$ ${total.toFixed(2)}</strong></p>`;
+        resumoProdutos.innerHTML = html;
 
       } catch (err) {
-        console.error("Erro ao carregar compras:", err);
-        listaCompras.innerHTML = "<p style='color: red;'>Erro ao carregar as compras.</p>";
+        console.error("Erro ao carregar carrinho:", err);
+        resumoProdutos.innerHTML = "<p style='color: red;'>Erro ao carregar os produtos.</p>";
       }
     }
 
-    carregarCompras();
+    async function finalizarCompra() {
+      try {
+        const res = await fetch('/api/compras/finalizar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailUsuario: usuario.email })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          mensagem.style.color = "green";
+          mensagem.textContent = "Pedido enviado para a empresa!";
+          resumoProdutos.innerHTML = "";
+        } else {
+          mensagem.style.color = "red";
+          mensagem.textContent = data.error || "Erro ao finalizar a compra.";
+        }
+      } catch (err) {
+        console.error("Erro ao finalizar:", err);
+        mensagem.style.color = "red";
+        mensagem.textContent = "Erro de conexão.";
+      }
+    }
+
+    carregarResumoCompra();
   </script>
 </body>
 </html>
