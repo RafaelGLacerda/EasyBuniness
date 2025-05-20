@@ -74,7 +74,7 @@
       try {
         const res = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`);
         const json = await res.json();
-        const pedidos = json.compras || [];
+        const pedidos = json.comprasRecebidas || [];
 
         if (pedidos.length === 0) {
           listaPedidos.innerHTML = "<p>Nenhum pedido recebido até o momento.</p>";

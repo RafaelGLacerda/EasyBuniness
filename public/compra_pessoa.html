@@ -146,9 +146,12 @@ async function finalizarCompra() {
     const data = await res.json();
 
     if (res.ok) {
-      mensagem.style.color = "green";
-      mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
-      await carregarCarrinho();
+  mensagem.style.color = "green";
+  mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
+  setTimeout(() => {
+    window.location.href = "minhas_compras.html";
+  }, 2000);
+
     } else {
       mensagem.style.color = "red";
       mensagem.textContent = data.error || "Erro ao finalizar a compra.";

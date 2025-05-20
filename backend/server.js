@@ -423,3 +423,39 @@ app.post('/api/compras/resposta', (req, res) => {
   salvarUsuarios(dados);
   res.json({ mensagem: "Pedido atualizado com sucesso." });
 });
+
+
+
+
+
+app.post('/api/carrinho/atualizar-quantidade', (req, res) => {
+  const { emailUsuario, produtoIndex, delta } = req.body;
+  const data = lerUsuarios();
+
+  const usuario = data.pessoas.find(p => p.email === emailUsuario);
+  if (!usuario || !usuario.carrinho || produtoIndex >= usuario.carrinho.length) {
+    return res.status(404).json({ error: 'Usuário ou item não encontrado' });
+  }
+
+  usuario.carrinho[produtoIndex].quantidade += delta;
+  if (usuario.carrinho[produtoIndex].quantidade < 1) {
+    usuario.carrinho[produtoIndex].quantidade = 1;
+  }
+
+  salvarUsuarios(data);
+  res.json({ mensagem: 'Quantidade atualizada' });
+});
+
+app.post('/api/carrinho/remover', (req, res) => {
+  const { emailUsuario, produtoIndex } = req.body;
+  const data = lerUsuarios();
+
+  const usuario = data.pessoas.find(p => p.email === emailUsuario);
+  if (!usuario || !usuario.carrinho || produtoIndex >= usuario.carrinho.length) {
+    return res.status(404).json({ error: 'Usuário ou item não encontrado' });
+  }
+
+  usuario.carrinho.splice(produtoIndex, 1);
+  salvarUsuarios(data);
+  res.json({ mensagem: 'Item removido do carrinho.' });
+});
