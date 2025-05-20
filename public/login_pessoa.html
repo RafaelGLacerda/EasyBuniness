@@ -27,38 +27,46 @@
   </main>
 
   <script>
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
-      const senha = document.getElementById("senha").value.trim();
-      const mensagem = document.getElementById("mensagem");
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value.trim();
+  const mensagem = document.getElementById("mensagem");
 
-      if (!email || !senha) {
-        mensagem.textContent = "Preencha todos os campos.";
-        return;
-      }
+  if (!email || !senha) {
+    mensagem.textContent = "Preencha todos os campos.";
+    return;
+  }
 
-      try {
-        const res = await fetch('https://easybuniness.onrender.com/login-usuario', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
-
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          localStorage.setItem("usuario", JSON.stringify(data.usuario));
-          window.location.href = "dashboard_pessoa.html";  // Redirecionar para o painel do usuário
-        } else {
-          mensagem.textContent = "Email ou senha inválidos.";
-        }
-      } catch (err) {
-        console.error(err);
-        mensagem.textContent = "Erro ao conectar com o servidor.";
-      }
+  try {
+    const res = await fetch('https://easybuniness.onrender.com/login-usuario', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
     });
+
+    // ⛔ Se a resposta for erro, nem tente fazer .json()
+    if (!res.ok) {
+      mensagem.textContent = "Email ou senha inválidos.";
+      return;
+    }
+
+    const data = await res.json();
+
+    if (data.success && data.usuario) {
+      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      window.location.href = "dashboard_pessoa.html";
+    } else {
+      mensagem.textContent = "Erro ao processar login.";
+    }
+
+  } catch (err) {
+    console.error("Erro no login:", err);
+    mensagem.textContent = "Erro ao conectar com o servidor.";
+  }
+});
+
   </script>
 </body>
 </html>
