@@ -72,7 +72,7 @@
 
     async function carregarPedidos() {
       try {
-        const res = await fetch(`/api/compras/empresa/${empresa.email}`);
+        const res = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`);
         const json = await res.json();
         const pedidos = json.compras || [];
 
@@ -121,12 +121,12 @@
     }
 
     async function responderPedido(index, status) {
-      const pedidos = await fetch(`/api/compras/empresa/${empresa.email}`).then(res => res.json());
+      const pedidos = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`).then(res => res.json());
       const pedido = pedidos.compras[index];
       const obs = document.getElementById(`obs-${index}`).value;
 
       try {
-        const res = await fetch('/api/compras/resposta', {
+        const res = await fetch('https://easybuniness.onrender.com/api/compras/resposta', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

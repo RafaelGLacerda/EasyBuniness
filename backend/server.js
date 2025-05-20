@@ -291,82 +291,93 @@ app.get('/api/carrinho/:email', (req, res) => {
 });
 
 
+// 📌 Rota 3 
 app.post('/api/compras/finalizar', (req, res) => {
-  const { emailUsuario } = req.body;
-  const dados = lerUsuarios();
+  try {
+    const { emailUsuario } = req.body;
+    const dados = lerUsuarios();
 
-  const usuario = dados.pessoas.find(p => p.email === emailUsuario);
-  if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado.' });
+    const usuario = dados.pessoas.find(p => p.email === emailUsuario);
+    if (!usuario) return res.status(404).json({ error: 'Usuário não encontrado.' });
 
-  const carrinho = usuario.carrinho || [];
-  if (carrinho.length === 0) return res.status(400).json({ error: 'Carrinho está vazio.' });
+    if (!usuario.carrinho) usuario.carrinho = [];
+    if (!usuario.compras) usuario.compras = [];
 
-  const produtosPorEmpresa = {};
+    const carrinho = usuario.carrinho;
+    if (carrinho.length === 0) return res.status(400).json({ error: 'Carrinho está vazio.' });
 
-  for (let item of carrinho) {
-    const empresa = dados.empresas.find(e => e.email === item.empresaEmail);
-    if (!empresa) return res.status(404).json({ error: 'Empresa não encontrada.' });
+    const produtosPorEmpresa = {};
 
-    const produto = empresa.produtos[item.produtoIndex];
-    if (!produto) return res.status(404).json({ error: 'Produto não encontrado.' });
+    for (let item of carrinho) {
+      const empresa = dados.empresas.find(e => e.email === item.empresaEmail);
+      if (!empresa) return res.status(404).json({ error: 'Empresa não encontrada.' });
 
-    if (produto.quantidade < item.quantidade) {
-      return res.status(400).json({ error: `Estoque insuficiente para ${produto.nome}` });
+      if (!empresa.produtos) empresa.produtos = [];
+
+      const produto = empresa.produtos[item.produtoIndex];
+      if (!produto) return res.status(404).json({ error: 'Produto não encontrado.' });
+
+      if (produto.quantidade < item.quantidade) {
+        return res.status(400).json({ error: `Estoque insuficiente para ${produto.nome}` });
+      }
+
+      if (!produtosPorEmpresa[item.empresaEmail]) {
+        produtosPorEmpresa[item.empresaEmail] = [];
+      }
+
+      produtosPorEmpresa[item.empresaEmail].push({
+        nome: produto.nome,
+        preco: produto.preco,
+        quantidade: item.quantidade
+      });
+
+      produto.quantidade -= item.quantidade;
     }
 
-    // Agrupar por empresa
-    if (!produtosPorEmpresa[item.empresaEmail]) {
-      produtosPorEmpresa[item.empresaEmail] = [];
+    const dataAtual = new Date().toISOString();
+
+    for (let empresaEmail in produtosPorEmpresa) {
+      const produtos = produtosPorEmpresa[empresaEmail];
+
+      const compraPessoa = {
+        empresaEmail,
+        produtos,
+        status: "Pendente",
+        observacao: "",
+        data: dataAtual
+      };
+
+      const empresa = dados.empresas.find(e => e.email === empresaEmail);
+      if (!empresa.comprasRecebidas) empresa.comprasRecebidas = [];
+
+      const compraEmpresa = {
+        usuario: {
+          nome: usuario.nome,
+          email: usuario.email,
+          endereco: usuario.endereco,
+          contato: usuario.contato
+        },
+        produtos,
+        status: "Pendente",
+        observacao: "",
+        data: dataAtual
+      };
+
+      usuario.compras.push(compraPessoa);
+      empresa.comprasRecebidas.push(compraEmpresa);
     }
 
-    produtosPorEmpresa[item.empresaEmail].push({
-      nome: produto.nome,
-      preco: produto.preco,
-      quantidade: item.quantidade
-    });
+    usuario.carrinho = [];
 
-    // Atualizar estoque
-    produto.quantidade -= item.quantidade;
+    salvarUsuarios(dados);
+    res.json({ mensagem: "Compra finalizada e enviada para as empresas." });
+
+  } catch (err) {
+    console.error("Erro interno ao finalizar compra:", err);
+    res.status(500).json({ error: "Erro interno ao finalizar a compra." });
   }
-
-  // Criar compras em pessoa e empresa
-  const dataAtual = new Date().toISOString();
-
-  for (let empresaEmail in produtosPorEmpresa) {
-    const produtos = produtosPorEmpresa[empresaEmail];
-
-    const compraPessoa = {
-      empresaEmail,
-      produtos,
-      status: "Pendente",
-      observacao: "",
-      data: dataAtual
-    };
-
-    const empresa = dados.empresas.find(e => e.email === empresaEmail);
-    const compraEmpresa = {
-      usuario: {
-        nome: usuario.nome,
-        email: usuario.email,
-        endereco: usuario.endereco,
-        contato: usuario.contato
-      },
-      produtos,
-      status: "Pendente",
-      observacao: "",
-      data: dataAtual
-    };
-
-    usuario.compras.push(compraPessoa);
-    empresa.comprasRecebidas.push(compraEmpresa);
-  }
-
-  // Limpar carrinho do usuário
-  usuario.carrinho = [];
-
-  salvarUsuarios(dados);
-  res.json({ mensagem: "Compra finalizada e enviada para as empresas." });
 });
+
 
 
 

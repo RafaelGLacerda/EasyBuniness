@@ -51,7 +51,7 @@
 
     async function carregarCompras() {
       try {
-        const res = await fetch(`/api/compras/pessoa/${usuario.email}`);
+        const res = await fetch(`https://easybuniness.onrender.com/api/compras/pessoa/${usuario.email}`);
         const json = await res.json();
         const compras = json.compras || [];
 
@@ -60,7 +60,7 @@
           return;
         }
 
-        const empresasRes = await fetch('/api/empresas');
+        const empresasRes = await fetch('https://easybuniness.onrender.com/api/empresas');
         const empresas = await empresasRes.json();
 
         let html = "";

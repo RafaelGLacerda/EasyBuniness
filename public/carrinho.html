@@ -34,7 +34,7 @@
 
     async function carregarCarrinho() {
       try {
-        const res = await fetch(`/api/carrinho/${usuario.email}`);
+        const res = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
         const json = await res.json();
         dadosCarrinho = json.carrinho || [];
 
@@ -44,7 +44,7 @@
           return;
         }
 
-        const empresasRes = await fetch(`/api/empresas`);
+        const empresasRes = await fetch(`https://easybuniness.onrender.com/api/empresas`);
         const empresas = await empresasRes.json();
 
         let html = "";
@@ -86,7 +86,7 @@
 
     async function alterarQuantidade(email, produtoIndex, delta) {
       try {
-        const res = await fetch('/api/carrinho/atualizar-quantidade', {
+        const res = await fetch('https://easybuniness.onrender.com/api/carrinho/atualizar-quantidade', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ emailUsuario: email, produtoIndex, delta })
@@ -108,7 +108,7 @@
       if (!confirm("Deseja remover este item do carrinho?")) return;
 
       try {
-        const res = await fetch('/api/carrinho/remover', {
+        const res = await fetch('https://easybuniness.onrender.com/api/carrinho/remover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ emailUsuario: email, produtoIndex })
@@ -126,30 +126,40 @@
       }
     }
 
-    async function finalizarCompra() {
-      try {
-        const res = await fetch('/api/compras/finalizar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailUsuario: usuario.email })
-        });
+async function finalizarCompra() {
+  try {
+    const res = await fetch('https://easybuniness.onrender.com/api/compras/finalizar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ emailUsuario: usuario.email })
+    });
 
-        const data = await res.json();
+    const contentType = res.headers.get("content-type");
 
-        if (res.ok) {
-          mensagem.style.color = "green";
-          mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
-          await carregarCarrinho(); // recarrega o carrinho após finalizar
-        } else {
-          mensagem.style.color = "red";
-          mensagem.textContent = data.error || "Erro ao finalizar a compra.";
-        }
-      } catch (err) {
-        console.error("Erro ao finalizar compra:", err);
-        mensagem.style.color = "red";
-        mensagem.textContent = "Erro de conexão.";
-      }
+    // Se não for JSON, converte para texto e lança erro
+    if (!contentType || !contentType.includes("application/json")) {
+      const erroTexto = await res.text();
+      throw new Error("Resposta inválida do servidor:\n" + erroTexto);
     }
+
+    const data = await res.json();
+
+    if (res.ok) {
+      mensagem.style.color = "green";
+      mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
+      await carregarCarrinho();
+    } else {
+      mensagem.style.color = "red";
+      mensagem.textContent = data.error || "Erro ao finalizar a compra.";
+    }
+
+  } catch (err) {
+    console.error("Erro ao finalizar compra:", err);
+    mensagem.style.color = "red";
+    mensagem.textContent = "Erro ao finalizar compra: " + err.message;
+  }
+}
+
 
     carregarCarrinho();
   </script>
