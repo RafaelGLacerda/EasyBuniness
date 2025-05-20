@@ -32,20 +32,29 @@
 
     let dadosCarrinho = [];
 
-    async function carregarCarrinho() {
-      try {
-        const res = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
-        const json = await res.json();
-        dadosCarrinho = json.carrinho || [];
+ async function carregarCarrinho() {
+  try {
+    const res = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
 
-        if (dadosCarrinho.length === 0) {
-          listaCarrinho.innerHTML = "<p>Seu carrinho está vazio.</p>";
-          totalCarrinho.textContent = "Total: R$ 0,00";
-          return;
-        }
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const erro = await res.text();
+      throw new Error("Resposta inesperada: " + erro);
+    }
 
-        const empresasRes = await fetch(`https://easybuniness.onrender.com/api/empresas`);
-        const empresas = await empresasRes.json();
+    const json = await res.json();
+    dadosCarrinho = json.carrinho || [];
+
+    if (dadosCarrinho.length === 0) {
+      listaCarrinho.innerHTML = "<p>Seu carrinho está vazio.</p>";
+      totalCarrinho.textContent = "Total: R$ 0,00";
+      return;
+    }
+
+    const empresasRes = await fetch(`https://easybuniness.onrender.com/empresas`);
+    const empresas = await empresasRes.json();
+
+
 
         let html = "";
         let total = 0;
