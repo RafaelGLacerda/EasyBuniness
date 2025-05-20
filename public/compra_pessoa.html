@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Minhas Compras</title>
+  <link rel="stylesheet" href="css/compras_pessoa.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Minhas Compras</h1>
+    <div id="listaCompras"></div>
+    <button onclick="window.location.href='carrinho.html'">Voltar</button>
+  </div>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (!usuario) {
+      alert("Faça login primeiro.");
+      window.location.href = "index.html";
+    }
+
+    const listaCompras = document.getElementById("listaCompras");
+
+    async function carregarCompras() {
+      try {
+        const res = await fetch(`/api/compras/pessoa/${usuario.email}`);
+        const json = await res.json();
+        const compras = json.compras || [];
+
+        if (compras.length === 0) {
+          listaCompras.innerHTML = "<p>Você ainda não realizou nenhuma compra.</p>";
+          return;
+        }
+
+        let html = "";
+
+        for (const compra of compras) {
+          const produtosHTML = compra.produtos.map(p => `
+            <div class="produto">
+              <p><strong>${p.nome}</strong> — R$ ${p.preco.toFixed(2)} x ${p.quantidade}</p>
+            </div>
+          `).join("");
+
+          const dataFormatada = new Date(compra.data).toLocaleString("pt-BR");
+
+          html += `
+            <div class="compra-card">
+              <h3>Empresa: ${compra.empresaEmail}</h3>
+              <p><strong>Status:</strong> ${compra.status}</p>
+              <p><strong>Data:</strong> ${dataFormatada}</p>
+              <div class="produtos">
+                ${produtosHTML}
+              </div>
+              <p><strong>Observação:</strong> ${compra.observacao || 'Nenhuma'}</p>
+              <hr>
+            </div>
+          `;
+        }
+
+        listaCompras.innerHTML = html;
+
+      } catch (err) {
+        console.error("Erro ao carregar compras:", err);
+        listaCompras.innerHTML = "<p style='color: red;'>Erro ao carregar as compras.</p>";
+      }
+    }
+
+    carregarCompras();
+  </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meu Carrinho</title>
+  <link rel="stylesheet" href="css/carrinho.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Carrinho de Compras</h1>
+    <div id="listaCarrinho"></div>
+    <p id="totalCarrinho">Total: R$ 0,00</p>
+
+    <button id="btnFinalizar onclick="window.location.href='compra_pessoa.html'">Finalizar Compra</button>
+    <button onclick="window.location.href='dashboard_pessoa.html'">Voltar</button>
+    <button class="logout-btn" style="background-color: #ffc107;" onclick="window.location.href='compra_pessoa.html'">Finalizar</button>
+
+
+
+    <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
+  </div>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (!usuario) {
+      alert("Faça login primeiro.");
+      window.location.href = "index.html";
+    }
+
+    const listaCarrinho = document.getElementById("listaCarrinho");
+    const totalCarrinho = document.getElementById("totalCarrinho");
+    const mensagem = document.getElementById("mensagem");
+    const btnFinalizar = document.getElementById("btnFinalizar");
+
+    let dadosCarrinho = [];
+
+    async function carregarCarrinho() {
+      try {
+        const res = await fetch(`/api/carrinho/${usuario.email}`);
+        const json = await res.json();
+        dadosCarrinho = json.carrinho || [];
+
+        if (dadosCarrinho.length === 0) {
+          listaCarrinho.innerHTML = "<p>Seu carrinho está vazio.</p>";
+          totalCarrinho.textContent = "Total: R$ 0,00";
+          return;
+        }
+
+        const empresasRes = await fetch(`/api/empresas`);
+        const empresas = await empresasRes.json();
+
+        let html = "";
+        let total = 0;
+
+        for (const item of dadosCarrinho) {
+          const empresa = empresas.find(e => e.email === item.empresaEmail);
+          if (!empresa) continue;
+          const produto = empresa.produtos[item.produtoIndex];
+          if (!produto) continue;
+
+          const subtotal = produto.preco * item.quantidade;
+          total += subtotal;
+
+          html += `
+            <div class="item-carrinho">
+              <h3>${produto.nome}</h3>
+              <p><strong>Empresa:</strong> ${empresa.nome}</p>
+              <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
+              <p><strong>Quantidade:</strong> ${item.quantidade}</p>
+              <p><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</p>
+              <hr>
+            </div>
+          `;
+        }
+
+        listaCarrinho.innerHTML = html;
+        totalCarrinho.textContent = "Total: R$ " + total.toFixed(2);
+
+      } catch (err) {
+        console.error("Erro ao carregar carrinho:", err);
+        listaCarrinho.innerHTML = "<p style='color: red;'>Erro ao carregar o carrinho.</p>";
+      }
+    }
+
+    btnFinalizar.addEventListener("click", async () => {
+      try {
+        const res = await fetch('/api/compras/finalizar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailUsuario: usuario.email })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          mensagem.style.color = "green";
+          mensagem.textContent = data.mensagem || "Compra finalizada!";
+          await carregarCarrinho();
+        } else {
+          mensagem.style.color = "red";
+          mensagem.textContent = data.error || "Erro ao finalizar a compra.";
+        }
+      } catch (err) {
+        console.error("Erro ao finalizar compra:", err);
+        mensagem.style.color = "red";
+        mensagem.textContent = "Erro de conexão.";
+      }
+    });
+
+    carregarCarrinho();
+  </script>
+</body>
+</html>

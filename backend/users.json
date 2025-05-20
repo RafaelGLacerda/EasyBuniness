@@ -8,8 +8,25 @@
   "telefone": "231321321",
   "contato": "instagram",
   "cpf": "123.456.789-00",
-  "endereco": "Rua Exemplo, 123"
+  "endereco": "Rua Exemplo, 123",
+    "carrinho": [
+    {
+      "empresaEmail": "empresa@exemplo.com",
+      "produtoIndex": 0,
+      "quantidade": 2
+    }
+  ],
+  "compras": [
+    {
+      "empresaEmail": "empresa@exemplo.com",
+      "produtos": "",
+      "status": "",
+      "observacao": "",
+      "data": ""
+    }
+  ]
 }
+
 
   ],
   "empresas": [
@@ -22,6 +39,15 @@
       "telefone": "99321933",
       "senha": "rafael12",
       "status": "Fechada",
+        "comprasRecebidas": [
+    {
+      "usuarioEmail": "",
+      "produtos": "",
+      "status": "",
+      "observacao": "",
+      "data": ""
+    }
+  ],
       "produtos": [
         {
           "nome": "dwadwa",
