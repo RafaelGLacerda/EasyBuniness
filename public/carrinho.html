@@ -70,20 +70,26 @@
           total += subtotal;
 
           html += `
-            <div class="item-carrinho">
-              <h3>${produto.nome}</h3>
-              <p><strong>Empresa:</strong> ${empresa.nome}</p>
-              <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
-              <p><strong>Quantidade:</strong>
-                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, -1)">-</button>
-                <span id="qtd-${index}">${item.quantidade}</span>
-                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, 1)">+</button>
-              </p>
-              <p><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</p>
-              <button class="btn-remover" onclick="removerItem('${usuario.email}', ${index})">Remover</button>
-              <hr>
-            </div>
-          `;
+  <div class="item-carrinho">
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <img src="${produto.imagem || '#'}" alt="${produto.nome}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+      <div>
+        <h3>${produto.nome}</h3>
+        <p><strong>Empresa:</strong> ${empresa.nome}</p>
+        <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
+        <p><strong>Quantidade:</strong>
+          <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, -1)">-</button>
+          <span id="qtd-${index}">${item.quantidade}</span>
+          <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, 1)">+</button>
+        </p>
+        <p><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</p>
+        <button class="btn-remover" onclick="removerItem('${usuario.email}', ${index})">Remover</button>
+      </div>
+    </div>
+    <hr>
+  </div>
+`;
+
         });
 
         listaCarrinho.innerHTML = html;

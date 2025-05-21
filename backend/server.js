@@ -325,7 +325,8 @@ app.post('/api/compras/finalizar', (req, res) => {
       produtosPorEmpresa[item.empresaEmail].push({
         nome: produto.nome,
         preco: produto.preco,
-        quantidade: item.quantidade
+        quantidade: item.quantidade,
+        imagem: produto.imagem || ''
       });
 
       produto.quantidade -= item.quantidade;

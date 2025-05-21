@@ -44,10 +44,38 @@
     button:hover {
       background-color: #218838;
     }
+
+    /* Estilo para mensagens interativas */
+    #msgInterativa {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: bold;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    #msgInterativa.sucesso {
+      background-color: #28a745;
+    }
+
+    #msgInterativa.erro {
+      background-color: #dc3545;
+    }
   </style>
 </head>
 <body>
   <div class="dashboard-container">
+    <div id="msgInterativa"></div> <!-- Mensagem interativa fixa -->
+
     <a href="dashboard_pessoa.html" class="logout-btn">Voltar</a>
     <button class="logout-btn" style="background-color: #ffc107;" onclick="window.location.href='carrinho.html'">Ir para o Carrinho</button>
 
@@ -69,11 +97,26 @@
   </div>
 
   <script>
+    function mostrarMensagem(texto, sucesso = true) {
+      const msgDiv = document.getElementById('msgInterativa');
+      msgDiv.textContent = texto;
+      msgDiv.className = sucesso ? 'sucesso' : 'erro';
+      msgDiv.style.opacity = '1';
+      msgDiv.style.pointerEvents = 'auto';
+
+      setTimeout(() => {
+        msgDiv.style.opacity = '0';
+        msgDiv.style.pointerEvents = 'none';
+      }, 4000);
+    }
+
     async function adicionarAoCarrinho(empresaEmail, produtoIndex, maxQuantidade) {
       const usuario = JSON.parse(localStorage.getItem('usuario'));
       if (!usuario) {
-        alert("Você precisa estar logado.");
-        window.location.href = "index.html";
+        mostrarMensagem("Você precisa estar logado.", false);
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 2000);
         return;
       }
 
@@ -81,12 +124,12 @@
       let quantidade = parseInt(input.value);
 
       if (isNaN(quantidade) || quantidade < 1) {
-        alert("Quantidade inválida.");
+        mostrarMensagem("Quantidade inválida.", false);
         return;
       }
 
       if (quantidade > maxQuantidade) {
-        alert("Quantidade excede o estoque disponível.");
+        mostrarMensagem("Quantidade excede o estoque disponível.", false);
         return;
       }
 
@@ -105,13 +148,13 @@
         const data = await res.json();
 
         if (res.ok) {
-          alert("Produto adicionado ao carrinho!");
+          mostrarMensagem("Produto adicionado ao carrinho!", true);
         } else {
-          alert(data.error || "Erro ao adicionar ao carrinho.");
+          mostrarMensagem(data.error || "Erro ao adicionar ao carrinho.", false);
         }
       } catch (err) {
         console.error("Erro ao adicionar ao carrinho:", err);
-        alert("Erro de conexão.");
+        mostrarMensagem("Erro de conexão.", false);
       }
     }
 
@@ -119,8 +162,10 @@
       const empresaId = localStorage.getItem('empresaVisualizada');
 
       if (!empresaId) {
-        alert('Nenhuma empresa selecionada.');
-        window.location.href = 'dashboard_pessoa.html';
+        mostrarMensagem('Nenhuma empresa selecionada.', false);
+        setTimeout(() => {
+          window.location.href = 'dashboard_pessoa.html';
+        }, 2000);
         return;
       }
 
@@ -142,6 +187,7 @@
         document.getElementById('qtdProdutos').textContent = "Quantidade: " + produtos.length;
 
         const listaProdutos = document.getElementById('listaProdutos');
+        listaProdutos.innerHTML = '';
 
         produtos.forEach((produto, i) => {
           const card = document.createElement('div');
@@ -167,8 +213,10 @@
 
       } catch (error) {
         console.error(error);
-        alert('Erro ao carregar informações da empresa.');
-        window.location.href = 'dashboard_pessoa.html';
+        mostrarMensagem('Erro ao carregar informações da empresa.', false);
+        setTimeout(() => {
+          window.location.href = 'dashboard_pessoa.html';
+        }, 2000);
       }
     });
   </script>

@@ -52,12 +52,21 @@
     .indeferir {
       background-color: #dc3545;
     }
+
+    /* Estilo para mensagem interativa */
+    #msgResposta {
+      margin-top: 15px;
+      font-weight: bold;
+      transition: opacity 0.5s;
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Pedidos Recebidos</h1>
     <div id="listaPedidos"></div>
+    <div id="msgResposta"></div> <!-- Mensagem interativa aqui -->
     <button onclick="window.location.href='dashboard_empresa.html'">Voltar</button>
   </div>
 
@@ -69,6 +78,16 @@
     }
 
     const listaPedidos = document.getElementById("listaPedidos");
+
+    function mostrarMensagem(texto, sucesso = true) {
+      const msgDiv = document.getElementById('msgResposta');
+      msgDiv.textContent = texto;
+      msgDiv.style.color = sucesso ? '#28a745' : '#dc3545';
+      msgDiv.style.opacity = '1';
+      setTimeout(() => {
+        msgDiv.style.opacity = '0';
+      }, 4000); // desaparece após 4 segundos
+    }
 
     async function carregarPedidos() {
       try {
@@ -85,28 +104,32 @@
 
         pedidos.forEach((pedido, i) => {
           const produtosHTML = pedido.produtos.map(p => `
-            <div class="produto">
-              <p><strong>${p.nome}</strong> — R$ ${p.preco.toFixed(2)} x ${p.quantidade}</p>
+            <div class="produto" style="display: flex; gap: 15px; align-items: center; margin-bottom: 10px;">
+              <img src="${p.imagem || '#'}" alt="${p.nome}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+              <p><strong>${p.nome}</strong><br>R$ ${p.preco.toFixed(2)} x ${p.quantidade}</p>
             </div>
           `).join("");
 
+          const jaRespondido = pedido.status.toLowerCase() !== 'pendente';
+          const desabilitado = jaRespondido ? 'disabled' : '';
+
           html += `
-            <div class="pedido">
+            <div class="pedido ${pedido.status.toLowerCase()}">
               <p><strong>Cliente:</strong> ${pedido.usuario.nome}</p>
               <p><strong>Email:</strong> ${pedido.usuario.email}</p>
               <p><strong>Endereço:</strong> ${pedido.usuario.endereco}</p>
               <p><strong>Contato:</strong> ${pedido.usuario.contato}</p>
-              <p><strong>Status:</strong> ${pedido.status}</p>
+              <p><strong>Status:</strong> <span class="status">${pedido.status}</span></p>
 
               <h4>Produtos:</h4>
               ${produtosHTML}
 
               <label for="obs-${i}">Observação (opcional):</label>
-              <textarea id="obs-${i}" placeholder="Ex: Envio em 2 dias úteis."></textarea>
+              <textarea id="obs-${i}" placeholder="Ex: Envio em 2 dias úteis." ${desabilitado}>${pedido.observacao || ''}</textarea>
 
               <div class="botoes">
-                <button class="btn aceitar" onclick="responderPedido(${i}, 'aceita')">Aceitar</button>
-                <button class="btn indeferir" onclick="responderPedido(${i}, 'indeferida')">Indeferir</button>
+                <button class="btn aceitar" onclick="responderPedido(${i}, 'aceita')" ${desabilitado}>Aceitar</button>
+                <button class="btn indeferir" onclick="responderPedido(${i}, 'indeferida')" ${desabilitado}>Indeferir</button>
               </div>
             </div>
           `;
@@ -120,38 +143,37 @@
       }
     }
 
-async function responderPedido(index, status) {
-  const pedidosRes = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`);
-  const pedidosJson = await pedidosRes.json();
-  const pedido = pedidosJson.comprasRecebidas[index]; // CORRIGIDO
-  const obs = document.getElementById(`obs-${index}`).value;
+    async function responderPedido(index, status) {
+      try {
+        const pedidosRes = await fetch(`https://easybuniness.onrender.com/api/compras/empresa/${empresa.email}`);
+        const pedidosJson = await pedidosRes.json();
+        const pedido = pedidosJson.comprasRecebidas[index];
+        const obs = document.getElementById(`obs-${index}`).value;
 
-  try {
-    const res = await fetch('https://easybuniness.onrender.com/api/compras/resposta', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        emailEmpresa: empresa.email,
-        indexPedido: index,
-        status,
-        observacao: obs
-      })
-    });
+        const res = await fetch('https://easybuniness.onrender.com/api/compras/resposta', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            emailEmpresa: empresa.email,
+            indexPedido: index,
+            status,
+            observacao: obs
+          })
+        });
 
-    const data = await res.json();
+        const data = await res.json();
 
-    if (res.ok) {
-      alert("Pedido respondido com sucesso!");
-      carregarPedidos();
-    } else {
-      alert(data.error || "Erro ao enviar resposta.");
+        if (res.ok) {
+          mostrarMensagem("Pedido respondido com sucesso!", true);
+          carregarPedidos();
+        } else {
+          mostrarMensagem(data.error || "Erro ao enviar resposta.", false);
+        }
+      } catch (err) {
+        console.error("Erro:", err);
+        mostrarMensagem("Erro de conexão.", false);
+      }
     }
-  } catch (err) {
-    console.error("Erro:", err);
-    alert("Erro de conexão.");
-  }
-}
-
 
     carregarPedidos();
   </script>
