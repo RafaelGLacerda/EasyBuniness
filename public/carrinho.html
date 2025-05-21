@@ -4,52 +4,82 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Meu Carrinho</title>
-  <link rel="stylesheet" href="css/carrinho.css" />
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0; padding: 20px;
+      color: #333;
+    }
     .container {
-      max-width: 800px;
-      margin: auto;
+      max-width: 700px;
+      background: #fff;
+      margin: 0 auto;
       padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
     }
     .item-carrinho {
-      background: #f9f9f9;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 15px;
       margin-bottom: 15px;
+    }
+    .item-carrinho h3 {
+      margin: 0 0 5px 0;
+      color: #34495e;
+    }
+    .item-carrinho p {
+      margin: 4px 0;
     }
     .btn-quantidade, .btn-remover, .btn-finalizar, .voltar-btn {
       cursor: pointer;
+      background-color: #27ae60;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .btn-quantidade {
-      background-color: #007bff;
-      color: white;
-      padding: 4px 10px;
-      margin: 0 5px;
-    }
-    .btn-remover {
-      background-color: #dc3545;
       color: white;
       padding: 6px 12px;
-      margin-top: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      margin: 0 2px;
+      transition: background-color 0.3s ease;
+    }
+    .btn-quantidade:hover, .btn-remover:hover, .btn-finalizar:hover, .voltar-btn:hover {
+      background-color: #219150;
+    }
+    .btn-remover {
+      background-color: #c0392b;
+    }
+    .btn-remover:hover {
+      background-color: #a83224;
     }
     .btn-finalizar {
-      background-color: #28a745;
-      color: white;
-      padding: 10px 20px;
-      margin-right: 10px;
+      display: inline-block;
+      margin-top: 20px;
+      font-weight: bold;
+      width: 100%;
     }
     .voltar-btn {
-      background-color: #6c757d;
-      color: white;
-      padding: 10px 20px;
+      background-color: #2980b9;
+      margin-top: 10px;
+      width: 100%;
+    }
+    #totalCarrinho {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+      text-align: right;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 15px 0;
     }
     #mensagem {
-      font-weight: bold;
       margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
@@ -75,61 +105,43 @@
     const listaCarrinho = document.getElementById("listaCarrinho");
     const totalCarrinho = document.getElementById("totalCarrinho");
     const mensagem = document.getElementById("mensagem");
+    const btnFinalizar = document.querySelector('.btn-finalizar');
 
     let dadosCarrinho = [];
 
     async function carregarCarrinho() {
       try {
-        // Busca o carrinho do usuário
-        const resCarrinho = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
+        const res = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
 
-        const ctCarrinho = resCarrinho.headers.get("content-type");
-        if (!ctCarrinho || !ctCarrinho.includes("application/json")) {
-          const errText = await resCarrinho.text();
-          throw new Error("Resposta inválida do servidor (carrinho): " + errText);
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          const erro = await res.text();
+          throw new Error("Resposta inesperada: " + erro);
         }
 
-        const jsonCarrinho = await resCarrinho.json();
-        dadosCarrinho = jsonCarrinho.carrinho || [];
+        const json = await res.json();
+        dadosCarrinho = json.carrinho || [];
 
         if (dadosCarrinho.length === 0) {
           listaCarrinho.innerHTML = "<p>Seu carrinho está vazio.</p>";
           totalCarrinho.textContent = "Total: R$ 0,00";
+          btnFinalizar.style.display = 'none';
           return;
+        } else {
+          btnFinalizar.style.display = 'inline-block';
         }
 
-        // Busca todas as empresas para cruzar com os produtos no carrinho
-        const resEmpresas = await fetch('https://easybuniness.onrender.com/api/empresas');
-
-        const ctEmpresas = resEmpresas.headers.get("content-type");
-        if (!ctEmpresas || !ctEmpresas.includes("application/json")) {
-          const errText = await resEmpresas.text();
-          throw new Error("Resposta inválida do servidor (empresas): " + errText);
-        }
-
-        const empresas = await resEmpresas.json();
+        const empresasRes = await fetch(`https://easybuniness.onrender.com/api/empresas`);
+        const empresas = await empresasRes.json();
 
         let html = "";
         let total = 0;
 
         dadosCarrinho.forEach((item, index) => {
           const empresa = empresas.find(e => e.email === item.empresaEmail);
-          if (!empresa) {
-            console.warn("Empresa não encontrada para email:", item.empresaEmail);
-            html += `<div class="item-carrinho" style="color:red;">
-                      Produto do carrinho com empresa não encontrada (email: ${item.empresaEmail})
-                    </div>`;
-            return;
-          }
-
-          const produto = empresa.produtos?.[item.produtoIndex];
-          if (!produto) {
-            console.warn("Produto não encontrado no índice", item.produtoIndex, "para empresa", empresa.nome);
-            html += `<div class="item-carrinho" style="color:red;">
-                      Produto não encontrado no carrinho (índice: ${item.produtoIndex}) da empresa ${empresa.nome}
-                    </div>`;
-            return;
-          }
+          if (!empresa) return;
+          const produto = empresa.produtos[item.produtoIndex];
+          if (!produto) return;
 
           const subtotal = produto.preco * item.quantidade;
           total += subtotal;
@@ -140,12 +152,13 @@
               <p><strong>Empresa:</strong> ${empresa.nome}</p>
               <p><strong>Preço:</strong> R$ ${produto.preco.toFixed(2)}</p>
               <p><strong>Quantidade:</strong>
-                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, -1)">-</button>
+                <button class="btn-quantidade" onclick="alterarQuantidade(${index}, -1)">-</button>
                 <span id="qtd-${index}">${item.quantidade}</span>
-                <button class="btn-quantidade" onclick="alterarQuantidade('${usuario.email}', ${index}, 1)">+</button>
+                <button class="btn-quantidade" onclick="alterarQuantidade(${index}, 1)">+</button>
               </p>
               <p><strong>Subtotal:</strong> R$ ${subtotal.toFixed(2)}</p>
-              <button class="btn-remover" onclick="removerItem('${usuario.email}', ${index})">Remover</button>
+              <button class="btn-remover" onclick="removerItem(${index})">Remover</button>
+              <hr>
             </div>
           `;
         });
@@ -155,22 +168,21 @@
 
       } catch (err) {
         console.error("Erro ao carregar carrinho:", err);
-        listaCarrinho.innerHTML = `<p style="color:red;">Erro ao carregar o carrinho: ${err.message}</p>`;
-        totalCarrinho.textContent = "Total: R$ 0,00";
+        listaCarrinho.innerHTML = "<p style='color: red;'>Erro ao carregar o carrinho.</p>";
       }
     }
 
-    async function alterarQuantidade(email, produtoIndex, delta) {
+    async function alterarQuantidade(produtoIndex, delta) {
       try {
         const res = await fetch('https://easybuniness.onrender.com/api/carrinho/atualizar-quantidade', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailUsuario: email, produtoIndex, delta })
+          body: JSON.stringify({ emailUsuario: usuario.email, produtoIndex, delta })
         });
 
         const data = await res.json();
         if (res.ok) {
-          await carregarCarrinho();
+          carregarCarrinho();
         } else {
           alert(data.error || "Erro ao alterar quantidade.");
         }
@@ -180,19 +192,19 @@
       }
     }
 
-    async function removerItem(email, produtoIndex) {
+    async function removerItem(produtoIndex) {
       if (!confirm("Deseja remover este item do carrinho?")) return;
 
       try {
         const res = await fetch('https://easybuniness.onrender.com/api/carrinho/remover', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailUsuario: email, produtoIndex })
+          body: JSON.stringify({ emailUsuario: usuario.email, produtoIndex })
         });
 
         const data = await res.json();
         if (res.ok) {
-          await carregarCarrinho();
+          carregarCarrinho();
         } else {
           alert(data.error || "Erro ao remover item.");
         }
