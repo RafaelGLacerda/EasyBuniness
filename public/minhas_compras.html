@@ -55,6 +55,7 @@
         
         const contentType = res.headers.get("content-type");
         const rawText = await res.text();
+        
         console.log("🔍 Resposta bruta:", rawText);
 
         if (!res.ok || !contentType || !contentType.includes("application/json")) {
