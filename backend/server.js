@@ -458,7 +458,7 @@ app.post('/api/carrinho/remover', (req, res) => {
 });
 
 // 📌 Rota 6 - Ver compras da pessoa
-app.get('/api/compras/pessoa/:email', (req, res) => {
+app.post('/api/compras/pessoa/:email', (req, res) => {
   const data = lerUsuarios();
   const pessoa = data.pessoas.find(p => p.email === req.params.email);
   if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada.' });

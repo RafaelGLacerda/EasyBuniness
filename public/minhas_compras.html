@@ -51,7 +51,14 @@
 
   async function carregarCompras() {
     try {
-      const res = await fetch(`https://easybuniness.onrender.com/api/compras/pessoa/${encodeURIComponent(usuario.email)}`);
+     const res = await fetch('https://easybuniness.onrender.com/api/compras/pessoa', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ email: usuario.email })
+});
+
 
       const contentType = res.headers.get("content-type");
       if (!res.ok || !contentType || !contentType.includes("application/json")) {
@@ -76,11 +83,13 @@
         const empresa = empresas.find(e => e.email === compra.empresaEmail);
         const nomeEmpresa = empresa ? empresa.nome : compra.empresaEmail;
 
-        const produtosHTML = compra.produtos.map(p => `
-          <div class="produto">
-            <p><strong>${p.nome}</strong> — R$ ${p.preco.toFixed(2)} x ${p.quantidade}</p>
-          </div>
-        `).join("");
+       const produtosHTML = (compra.produtos || []).map(p => `
+  <div class="produto">
+    <img src="${p.imagem || '#'}" alt="${p.nome}" style="width: 100px; border-radius: 8px;">
+    <p><strong>${p.nome || "Sem nome"}</strong> — R$ ${parseFloat(p.preco || 0).toFixed(2)} x ${p.quantidade || 0}</p>
+  </div>
+`).join("");
+
 
         const data = new Date(compra.data).toLocaleString("pt-BR");
         const statusClass = `status ${compra.status.toLowerCase()}`;
