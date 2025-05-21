@@ -6,48 +6,61 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to right, #c8a1a1, #5a3935);
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #d99f92, #8a5a4e); /* tom terroso quente */
   padding: 40px;
-  color: #333;
+  color: #3e2f2b;
+  min-height: 100vh;
 }
 
 .container {
-  background: #fff;
+  background: #ffffff;
   padding: 30px;
   border-radius: 16px;
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Título */
 h1 {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
   color: #4b2c28;
 }
 
 /* Itens do carrinho */
 .item-carrinho {
-  background: #fefefe;
-  border: 1px solid #ddd;
+  background: #fff9f7;
+  border: 1px solid #e4c2b9;
   border-left: 6px solid #007bff;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
   transition: background 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .item-carrinho h3 {
-  margin-bottom: 8px;
-  color: #333;
+  margin-bottom: 10px;
+  color: #4b2c28;
+  font-size: 1.3rem;
 }
 
 .item-carrinho p {
   margin: 6px 0;
   line-height: 1.5;
+  color: #5a3935;
+}
+
+/* Imagem */
+.item-carrinho img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
 /* Botões */
@@ -58,15 +71,14 @@ button {
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s ease;
+  transition: background 0.2s ease;
   color: white;
 }
 
-/* Ações */
+/* Ações específicas */
 .btn-remover {
   background-color: #dc3545;
 }
-
 .btn-remover:hover {
   background-color: #c82333;
 }
@@ -74,31 +86,31 @@ button {
 .btn-quantidade {
   background-color: #007bff;
   padding: 6px 12px;
+  margin: 0 5px;
 }
-
 .btn-quantidade:hover {
   background-color: #0056b3;
 }
 
 .btn-finalizar {
   background-color: #28a745;
-  margin-top: 15px;
+  margin-top: 20px;
+  width: 100%;
 }
-
 .btn-finalizar:hover {
   background-color: #218838;
 }
 
 .voltar-btn {
   background-color: #6c757d;
-  margin-top: 15px;
+  margin-top: 10px;
+  width: 100%;
 }
-
 .voltar-btn:hover {
   background-color: #5a6268;
 }
 
-/* Total */
+/* Total do carrinho */
 #totalCarrinho {
   font-size: 1.2rem;
   font-weight: bold;
@@ -112,4 +124,5 @@ button {
   margin-top: 20px;
   text-align: center;
   font-size: 1.1rem;
+  font-weight: bold;
 }

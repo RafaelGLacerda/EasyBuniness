@@ -78,3 +78,80 @@ table tr:hover td {
 .voltar-btn:hover {
   background-color: #5a6268;
 }
+.compra-card {
+  background: #fff9f7;
+  border-left: 6px solid #8a5a4e;
+  padding: 20px 24px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.compra-card:hover {
+  transform: translateY(-3px);
+}
+
+.compra-card p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #4b2c28;
+  line-height: 1.5;
+}
+
+.compra-card h4 {
+  margin-top: 16px;
+  font-size: 1.1rem;
+  color: #5a3935;
+  border-bottom: 1px solid #e0b5aa;
+  padding-bottom: 4px;
+}
+
+/* Status visual */
+.status-pendente {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.status-finalizado {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-cancelado {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Produtos dentro da compra */
+.compra-card .produto-item {
+  background: #ffffff;
+  border: 1px solid #e4c2b9;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.compra-card .produto-item p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #5a3935;
+}
+.btn-voltar {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 30px;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background-color: #c9302c;
+}

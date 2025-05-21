@@ -60,14 +60,31 @@
       transition: opacity 0.5s;
       opacity: 0;
     }
+    .btn-voltar {
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 30px;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background-color: #c9302c;
+}
   </style>
 </head>
 <body>
+     <button class="btn-voltar" onclick="window.location.href='dashboard_empresa.html'">Voltar</button>
   <div class="container">
     <h1>Pedidos Recebidos</h1>
     <div id="listaPedidos"></div>
     <div id="msgResposta"></div> <!-- Mensagem interativa aqui -->
-    <button onclick="window.location.href='dashboard_empresa.html'">Voltar</button>
   </div>
 
   <script>
