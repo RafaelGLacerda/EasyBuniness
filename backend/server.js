@@ -458,16 +458,13 @@ app.post('/api/carrinho/remover', (req, res) => {
 });
 
 // 📌 Rota 6 - Ver compras da pessoa
-// ✅ Rota alternativa segura para buscar compras por POST
-app.post('/api/compras/pessoa', (req, res) => {
-  const { email } = req.body;
+app.get('/api/compras/pessoa/:email', (req, res) => {
   const data = lerUsuarios();
-  const pessoa = data.pessoas.find(p => p.email === email);
+  const pessoa = data.pessoas.find(p => p.email === req.params.email);
   if (!pessoa) return res.status(404).json({ error: 'Pessoa não encontrada.' });
 
   res.json({ compras: pessoa.compras || [] });
 });
-
 
 
 // 🚀 Iniciar servidor
