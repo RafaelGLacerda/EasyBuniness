@@ -1,0 +1,102 @@
+/* Reset e base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #d99f92, #8a5a4e);
+  padding: 40px;
+  color: #3e2f2b;
+  min-height: 100vh;
+}
+
+.container {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 600px;
+  margin: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: #4b2c28;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 6px;
+  color: #4b2c28;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e4c2b9;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #fff9f7;
+  color: #4b2c28;
+}
+
+input[type="text"]::placeholder {
+  color: #a28c87;
+}
+
+#totalCompra {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 20px 0;
+  color: #4b2c28;
+  text-align: right;
+}
+
+.botoes {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+button {
+  font-size: 15px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  color: white;
+  flex: 1;
+}
+
+button:first-child {
+  background-color: #28a745;
+}
+button:first-child:hover {
+  background-color: #218838;
+}
+
+button:last-child {
+  background-color: #6c757d;
+}
+button:last-child:hover {
+  background-color: #5a6268;
+}
+
+#mensagem {
+  margin-top: 25px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+}

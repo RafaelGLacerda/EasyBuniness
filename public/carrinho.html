@@ -12,11 +12,12 @@
     <div id="listaCarrinho"></div>
     <p id="totalCarrinho">Total: R$ 0,00</p>
 
-    <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
+        <button class="btn-finalizar" onclick="window.location.href='finalizar_compra.html'">Finalizar Compra</button>
     <button class="voltar-btn" onclick="window.location.href='dashboard_pessoa.html'">Voltar</button>
 
     <p id="mensagem" style="margin-top: 15px; font-weight: bold;"></p>
   </div>
+
 
   <script>
     const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -142,40 +143,9 @@
       }
     }
 
-    async function finalizarCompra() {
-      try {
-        const res = await fetch('https://easybuniness.onrender.com/api/compras/finalizar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ emailUsuario: usuario.email })
-        });
-
-        const contentType = res.headers.get("content-type");
-
-        if (!contentType || !contentType.includes("application/json")) {
-          const erroTexto = await res.text();
-          throw new Error("Resposta inválida do servidor:\n" + erroTexto);
-        }
-
-        const data = await res.json();
-
-        if (res.ok) {
-          mensagem.style.color = "green";
-          mensagem.textContent = data.mensagem || "Compra finalizada com sucesso!";
-          await carregarCarrinho();
-        } else {
-          mensagem.style.color = "red";
-          mensagem.textContent = data.error || "Erro ao finalizar a compra.";
-        }
-
-      } catch (err) {
-        console.error("Erro ao finalizar compra:", err);
-        mensagem.style.color = "red";
-        mensagem.textContent = "Erro ao finalizar compra: " + err.message;
-      }
-    }
-
     carregarCarrinho();
+
+    
   </script>
 </body>
 </html>

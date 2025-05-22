@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Finalizar Compra</title>
+  <link rel="stylesheet" href="css/finalizar_compra.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Finalizar Compra</h1>
+
+    <div class="form-group">
+      <label for="endereco">Endereço (inclua o CEP):</label>
+      <input type="text" id="endereco" placeholder="Rua Exemplo, nº 123, Bairro - Cidade, CEP 00000-000" />
+    </div>
+
+    <div class="form-group">
+      <label for="contato">Contato:</label>
+      <input type="text" id="contato" placeholder="(99) 99999-9999" />
+    </div>
+
+    <p id="totalCompra"><strong>Total:</strong> R$ 0,00</p>
+
+    <div class="botoes">
+      <button onclick="confirmarCompra()">Confirmar Compra</button>
+      <button onclick="window.location.href='carrinho.html'">Voltar ao Carrinho</button>
+    </div>
+
+    <p id="mensagem" style="margin-top: 20px; font-weight: bold;"></p>
+  </div>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (!usuario) {
+      alert("Faça login primeiro.");
+      window.location.href = "index.html";
+    }
+
+    async function carregarTotal() {
+      try {
+        const res = await fetch(`https://easybuniness.onrender.com/api/carrinho/${usuario.email}`);
+        const json = await res.json();
+        const carrinho = json.carrinho || [];
+
+        const empresasRes = await fetch("https://easybuniness.onrender.com/empresas");
+        const empresas = await empresasRes.json();
+
+        let total = 0;
+        carrinho.forEach(item => {
+          const empresa = empresas.find(e => e.email === item.empresaEmail);
+          const produto = empresa?.produtos?.[item.produtoIndex];
+          if (produto) {
+            total += produto.preco * item.quantidade;
+          }
+        });
+
+        document.getElementById("totalCompra").innerHTML = `<strong>Total:</strong> R$ ${total.toFixed(2)}`;
+      } catch (err) {
+        console.error("Erro ao calcular total:", err);
+      }
+    }
+
+    async function confirmarCompra() {
+      const endereco = document.getElementById("endereco").value.trim();
+      const contato = document.getElementById("contato").value.trim();
+      const msg = document.getElementById("mensagem");
+
+      if (!endereco || !contato) {
+        msg.style.color = "red";
+        msg.textContent = "Preencha todos os campos.";
+        return;
+      }
+
+      // Atualiza dados do usuário antes de finalizar
+      await fetch('https://easybuniness.onrender.com/api/atualizarPessoa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: usuario.email,
+          endereco,
+          contato
+        })
+      });
+
+      // Finaliza compra
+      const res = await fetch('https://easybuniness.onrender.com/api/compras/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emailUsuario: usuario.email })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        msg.style.color = "green";
+        msg.textContent = data.mensagem || "Compra finalizada!";
+        setTimeout(() => {
+          window.location.href = "minhas_compras.html";
+        }, 2000);
+      } else {
+        msg.style.color = "red";
+        msg.textContent = data.error || "Erro ao finalizar compra.";
+      }
+    }
+
+    carregarTotal();
+  </script>
+</body>
+</html>
