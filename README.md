@@ -42,24 +42,7 @@
    cd backend
    npm install
    node src/server.js
-
-## 📷 Capturas de Tela (opcional)
-
-Adicione imagens das páginas principais aqui:
-- Página de Cadastro
-- Login
-- Lista de Produtos
-- Carrinho de Compras
-- Painel da Empresa
-- Minhas Compras / Minhas Vendas
-
-## 📌 Recursos Futuros (sugestões)
-
-- Integração com banco de dados real (MongoDB, PostgreSQL)
-- Upload de imagem para os produtos
-- Notificações por email
-- Chat entre comprador e vendedor
-- Sistema de avaliação de produtos e empresas
+   
 
 ## 🧑‍💻 Autor
 
