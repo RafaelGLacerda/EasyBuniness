@@ -33,23 +33,6 @@
 - **Persistência de Dados:** JSON local
 - **Hospedagem:** Localhost (ou pode ser facilmente hospedado no Render, Vercel, etc)
 
-## 📂 Estrutura do Projeto
-
-EasyBuniness/
-│
-├── public/ # Arquivos estáticos (HTML, CSS)
-├── src/
-│ ├── controllers/ # Lógica de manipulação dos dados
-│ ├── models/ # Estrutura dos dados (Usuário, Produto, Pedido)
-│ ├── routes/ # Rotas da API para pessoas, empresas, produtos, pedidos
-│ ├── data/ # Arquivos JSON simulando banco de dados
-│ └── server.js # Inicialização do servidor Express
-│
-├── README.md # Este arquivo
-└── package.json # Dependências e scripts
-
-
-
 ## 📦 Instalação Local
 
 1. **Clone o repositório:**
