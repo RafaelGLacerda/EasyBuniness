@@ -33,20 +33,4 @@
 - **Persistência de Dados:** JSON local
 - **Hospedagem:** Localhost (ou pode ser facilmente hospedado no Render, Vercel, etc)
 
-## 📦 Instalação Local
-
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/RafaelGLacerda/EasyBuniness.git
-   cd EasyBuniness
-   cd backend
-   npm install
-   node src/server.js
-   
-
-## 🧑‍💻 Autor
-
-Desenvolvido por [RafaelGLacerda](https://github.com/RafaelGLacerda)
-
-Se você gostou deste projeto, sinta-se à vontade para dar uma ⭐ no repositório e acompanhar outras criações no meu perfil!
 
